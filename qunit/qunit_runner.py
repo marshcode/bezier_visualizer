@@ -60,7 +60,6 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             the_file = sys.argv[1]
             one_file = os.path.isfile(the_file)
             one_file = one_file and fnmatch.fnmatch(os.path.basename(the_file), test_pattern)
-            sys.stdout.flush()
             
         if one_file:
             os.chdir(os.path.dirname(the_file))
