@@ -15,6 +15,8 @@ FILE_DIR = os.path.dirname( os.path.abspath(__file__) )
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
    
  
+    the_arg = None
+ 
     qunit_html_template = """
 <html>
     <head>
@@ -56,23 +58,21 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
         #a hack but whatever
         one_file = False
-        if len(sys.argv) >=2:
-            the_file = sys.argv[1]
+        if self.the_arg is not None:
+            the_file = self.the_arg
             one_file = os.path.isfile(the_file)
             one_file = one_file and fnmatch.fnmatch(os.path.basename(the_file), test_pattern)
             
         if one_file:
-            os.chdir(os.path.dirname(the_file))
-            tests.append( os.path.basename(the_file) )
+            tests.append( the_file )
         else:
-            for dirpath, dirnames, filenames in os.walk("."):
-                dirpath = dirpath[1:] 
-                if len(dirpath) == 0: dirpath = "/"
+            for dirpath, dirnames, filenames in os.walk(self.the_arg):
     
                 for fname in fnmatch.filter(filenames, test_pattern):
                     tests.append(os.path.join(dirpath, fname))
 
-        tests = ["""<script src="{}"></script>""".format(script) for script in tests]
+        tests = ["""<script src="{}"></script>""".format(script.replace(os.getcwd(), "")) 
+                 for script in tests]
 
         self.wfile.write( self.qunit_html_template.format(scripts = "\n".join(tests)) )
 
@@ -92,9 +92,12 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
  
  
 if __name__ == '__main__':
-    if len(sys.argv) >=2 and os.path.isdir(sys.argv[1]):
-        os.chdir(sys.argv[1])
-        
+    if len(sys.argv) >=2 and os.path.exists(sys.argv[1]):
+        MyHandler.the_arg = sys.argv[1]
+    else:
+        import sys
+        print "must call with file/directory as first argument"
+        sys.exit(-1)
     
     
     httpd = BaseHTTPServer.HTTPServer((HOST_NAME, PORT_NUMBER), MyHandler)
