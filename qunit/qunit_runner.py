@@ -24,7 +24,11 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
       <title>QUnit Automated Test Runner</title>
       <link rel="stylesheet" href="/qunit/qunit.css">
       
+      <!-- Source Includes -->
+      <script src="/js/core/bezier.js"></script>
+      <!-- Qunit -->
       <script src="/qunit/qunit.js"></script>
+      <!-- Test Includes -->
       {scripts}
       
     </head>
