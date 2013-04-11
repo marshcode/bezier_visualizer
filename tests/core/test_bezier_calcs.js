@@ -35,7 +35,8 @@ test("even distribution", function(){
 	var Ts =     [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
 	
 	for(var i=0;i<points.length;i++){
-		ok(  Math.abs( bezier_calculation(points, Ts[i]) - points[i]  ) < 0.001, "Bezier Curve @ " + Ts[i]  );
+		//ok(  Math.abs( bezier_calculation(points, Ts[i]) - points[i]  ) < 0.001, "Bezier Curve @ " + Ts[i]  );
+		fuzzy_equal(bezier_calculation(points, Ts[i]), points[i], "Bezier Curve @ " + Ts[i]);
 	}
 	
 	

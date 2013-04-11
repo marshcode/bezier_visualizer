@@ -28,6 +28,8 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
       <script src="/js/core/bezier.js"></script>
       <!-- Qunit -->
       <script src="/qunit/qunit.js"></script>
+      <script src="/qunit/qunit_utils.js"></script>
+      
       <!-- Test Includes -->
       {scripts}
       
@@ -90,6 +92,9 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.serve_path_file(os.path.join(FILE_DIR, "qunit.js"), "text/javascript")
         elif self.path.startswith("/qunit/qunit.css"):
             self.serve_path_file(os.path.join(FILE_DIR, "qunit.css"), "text/css")
+        elif self.path.startswith("/qunit/qunit_utils.js"):
+            self.serve_path_file(os.path.join(FILE_DIR, "qunit_utils.js"), "text/javascript")
+        
         else:
             SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
  
