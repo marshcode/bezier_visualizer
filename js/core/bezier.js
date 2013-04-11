@@ -23,3 +23,15 @@ function binomial_coefficients(n){
 	return C;
 }
 
+//calculates a single bezier curve at point t.
+function bezier_calculation(points, t){
+
+	var n = points.length-1;
+	var v = 0;
+	var C = binomial_coefficients(n); //very inefficient but whatever.  Caching can be handled later.
+	console.log(n);
+	for(var i=0;i<points.length;i++){
+		v += Math.pow(1-t, n-i) * Math.pow(t,i) * points[i] * C[i];
+	}
+	return v;
+}
