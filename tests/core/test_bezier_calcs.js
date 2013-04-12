@@ -34,10 +34,18 @@ test("even distribution", function(){
 	var points = [0, 1,   2,   3,   4,   5,   6,   7,   8,   9,   10];
 	var Ts =     [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
 	
-	for(var i=0;i<points.length;i++){
+	for(var i=0;i<Ts.length;i++){
 		//ok(  Math.abs( bezier_calculation(points, Ts[i]) - points[i]  ) < 0.001, "Bezier Curve @ " + Ts[i]  );
 		fuzzy_equal(bezier_calculation(points, Ts[i]), points[i], "Bezier Curve @ " + Ts[i]);
 	}
-	
-	
-});					
+});	
+
+test("uneven distribution", function(){
+	var points   = [0, 1,   2,   2.5, 3,   3.5, 4,   4.5, 5,   9,   10];
+	var Ts       = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+	var expected = [0, 0.957, 1.758, 2.411, 2.979, 3.532, 4.164, 5.036, 6.369, 8.250, 10];
+		
+	for(var i=0;i<Ts.length;i++){
+		fuzzy_equal(bezier_calculation(points, Ts[i]), expected[i], "Bezier Curve @ " + Ts[i]);
+	}
+});				
