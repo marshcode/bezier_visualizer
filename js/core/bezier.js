@@ -61,7 +61,9 @@ BezierCurve3.prototype.get_point = function(idx){
 BezierCurve3.prototype.calculate = function(t){
 	var x=[], y=[], z=[];
 	this._control_points.forEach(  function(pt){
-		x.push(pt.x); y.push(pt.y); z.push(pt.z);
+		x.push(pt.x); 
+		y.push(pt.y); 
+		z.push(pt.z);
 	});
 	
 	return new Dim3(
