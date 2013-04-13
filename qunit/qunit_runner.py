@@ -6,7 +6,7 @@ import os
 import fnmatch
 import sys
  
-HOST_NAME = 'localhost' # !!!REMEMBER TO CHANGE THIS!!!
+HOST_NAME = '' # !!!REMEMBER TO CHANGE THIS!!!
 PORT_NUMBER = 8080 # Maybe set this to 9000.
 
 FILE_DIR = os.path.dirname( os.path.abspath(__file__) )
