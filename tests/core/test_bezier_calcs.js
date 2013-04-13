@@ -48,4 +48,15 @@ test("uneven distribution", function(){
 	for(var i=0;i<Ts.length;i++){
 		fuzzy_equal(bezier_calculation(points, Ts[i]), expected[i], "Bezier Curve @ " + Ts[i]);
 	}
-});				
+});			
+
+test("back to start", function(){
+	var points   = [0, 1, 0];
+	var Ts       = [0, 0.25, 0.5, 0.75, 1];
+	var expected = [0, 0.375, 0.5, 0.375,  0];
+		
+	for(var i=0;i<Ts.length;i++){
+		fuzzy_equal(bezier_calculation(points, Ts[i]), expected[i], "Bezier Curve @ " + Ts[i]);
+	}
+
+})	
