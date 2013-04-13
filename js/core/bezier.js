@@ -1,3 +1,11 @@
+/////////////////////////
+//EXCEPTIONS
+/////////////////////////
+function IllegalArgumentError(){};
+
+
+
+
 //////////////////////////
 //Dim3
 //////////////////////////
@@ -32,4 +40,33 @@ function bezier_calculation(points, t){
 		v += Math.pow(1-t, n-i) * Math.pow(t,i) * points[i] * C[i];
 	}
 	return v;
+}
+
+///////////////////////////////////////////
+//Bezier Curve Classes
+///////////////////////////////////////////
+
+function BezierCurve3(control_points){
+
+	if(!control_points || control_points.length == 0){
+		throw new IllegalArgumentError("Must supply initial control points to curve.")
+	}
+	this._control_points = control_points;
+}
+
+BezierCurve3.prototype.get_point = function(idx){
+	return this._control_points[idx];
+}
+
+BezierCurve3.prototype.calculate = function(t){
+	var x=[], y=[], z=[];
+	this._control_points.forEach(  function(pt){
+		x.push(pt.x); y.push(pt.y); z.push(pt.z);
+	});
+	
+	return new Dim3(
+		bezier_calculation(x, t),
+		bezier_calculation(y, t),
+		bezier_calculation(z, t)
+	);
 }
