@@ -13,9 +13,9 @@ test("Empty Constructor", function () {
 	expect(1);
 
 	try {
-		var bz = new BEZIER.Core.BezierCurve3();
+		var bz = new BEZIER.core.BezierCurve3();
 	} catch (e) {
-		ok(e instanceof BEZIER.Errors.IllegalArgumentError, "Throws error on empty constructor");	
+		ok(e instanceof BEZIER.errors.IllegalArgumentError, "Throws error on empty constructor");	
 	}
 });
 
@@ -23,15 +23,15 @@ test("No Points", function () {
 	expect(1);
 
 	try {
-		var bz = new BEZIER.Core.BezierCurve3([]);
+		var bz = new BEZIER.core.BezierCurve3([]);
 	} catch (e) {
-		ok(e instanceof BEZIER.Errors.IllegalArgumentError, "Throws error when no control point are given.");	
+		ok(e instanceof BEZIER.errors.IllegalArgumentError, "Throws error when no control point are given.");	
 	}
 });
 
 test("Get Point", function () {
 	
-	var bc3 =  new BEZIER.Core.BezierCurve3([new BEZIER.Core.Dim3(0, 0, 0), new BEZIER.Core.Dim3(1, 1, 1)]);
+	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 0, 0), new BEZIER.core.Dim3(1, 1, 1)]);
 	
 	var d1 = bc3.get_point(0);
 	var d2 = bc3.get_point(1);
@@ -46,7 +46,7 @@ test("Get Point", function () {
 
 test("Calculate - Simple", function () {
 
-	var bc3 =  new BEZIER.Core.BezierCurve3([new BEZIER.Core.Dim3(0, 1, 2), new BEZIER.Core.Dim3(1, 2, 3)]);
+	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(1, 2, 3)]);
 
 	var t0   = bc3.calculate(0);
 	var t0p5 = bc3.calculate(0.5);

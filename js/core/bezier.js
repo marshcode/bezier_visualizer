@@ -1,12 +1,12 @@
 var BEZIER = BEZIER || {};
-BEZIER.Errors = BEZIER.Errors || {};
-BEZIER.Core = BEZIER.Core || {};
+BEZIER.errors = BEZIER.errors || {};
+BEZIER.core = BEZIER.core || {};
 
 
 /////////////////////////
 //EXCEPTIONS
 /////////////////////////
-BEZIER.Errors.IllegalArgumentError = function () {};
+BEZIER.errors.IllegalArgumentError = function () {};
 
 
 //////////////////////////
@@ -14,7 +14,7 @@ BEZIER.Errors.IllegalArgumentError = function () {};
 //////////////////////////
 //Basic Collection of x,y,z coordinates.  Useful as points, vectors, deltas, whatever.  Future iterations may 
 //require actual classes for these but there is no reason to get caught up in that now.
-BEZIER.Core.Dim3 = function (x, y, z) {
+BEZIER.core.Dim3 = function (x, y, z) {
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0; 
@@ -25,7 +25,7 @@ BEZIER.Core.Dim3 = function (x, y, z) {
 /////////////////////////////////////////
 //Calculates binomial coefficients for a single n.
 
-BEZIER.Core.binomial_coefficients = function (n) {
+BEZIER.core.binomial_coefficients = function (n) {
 	var C = [1];
 	for (var k = 0; k < n; ++ k) {
 		C[k + 1] = (C[k] * (n - k)) / (k + 1);
@@ -35,11 +35,11 @@ BEZIER.Core.binomial_coefficients = function (n) {
 };
 
 //calculates a single bezier curve at point t.
-BEZIER.Core.bezier_calculation = function (points, t) {
+BEZIER.core.bezier_calculation = function (points, t) {
 
 	var n = points.length - 1;
 	var v = 0;
-	var C = BEZIER.Core.binomial_coefficients(n); //very inefficient but whatever.  Caching can be handled later.
+	var C = BEZIER.core.binomial_coefficients(n); //very inefficient but whatever.  Caching can be handled later.
 	for (var i = 0;i < points.length; i++) {
 		v += Math.pow(1 - t, n - i) * Math.pow(t, i) * points[i] * C[i];
 	}
@@ -50,19 +50,19 @@ BEZIER.Core.bezier_calculation = function (points, t) {
 //Bezier Curve Classes
 ///////////////////////////////////////////
 
-BEZIER.Core.BezierCurve3 = function (control_points) {
+BEZIER.core.BezierCurve3 = function (control_points) {
 
 	if (!control_points || control_points.length === 0) {
-		throw new BEZIER.Errors.IllegalArgumentError("Must supply initial control points to curve.");
+		throw new BEZIER.errors.IllegalArgumentError("Must supply initial control points to curve.");
 	}
 	this._control_points = control_points;
 };
 
-BEZIER.Core.BezierCurve3.prototype.get_point = function (idx) {
+BEZIER.core.BezierCurve3.prototype.get_point = function (idx) {
 	return this._control_points[idx];
 };
 
-BEZIER.Core.BezierCurve3.prototype.calculate = function (t) {
+BEZIER.core.BezierCurve3.prototype.calculate = function (t) {
 	var x = [], y = [], z = [];
 	this._control_points.forEach(function (pt) {
 		x.push(pt.x); 
@@ -70,9 +70,9 @@ BEZIER.Core.BezierCurve3.prototype.calculate = function (t) {
 		z.push(pt.z);
 	});
 	
-	return new BEZIER.Core.Dim3(
-		BEZIER.Core.bezier_calculation(x, t),
-		BEZIER.Core.bezier_calculation(y, t),
-		BEZIER.Core.bezier_calculation(z, t)
+	return new BEZIER.core.Dim3(
+		BEZIER.core.bezier_calculation(x, t),
+		BEZIER.core.bezier_calculation(y, t),
+		BEZIER.core.bezier_calculation(z, t)
 	);
 };
