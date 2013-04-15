@@ -3,6 +3,7 @@
 /*global equal */ 
 /*global ok */ 
 /*global fuzzy_equal */ 
+/*global BEZIER */
 
 module("TestDim3");
 
