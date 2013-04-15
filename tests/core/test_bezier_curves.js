@@ -1,43 +1,50 @@
+/*global module */ 
+/*global test */ 
+/*global equal */ 
+/*global ok */ 
+/*global expect */
+/*global fuzzy_equal */ 
+
 module("BezierCurve - BezierCurve3");
 
-test("Empty Constructor", function(){
+test("Empty Constructor", function () {
 	expect(1);
 
-	try{
-		new BezierCurve3();
-	}catch(e){
-		ok( e instanceof IllegalArgumentError, "Throws error on empty constructor" )	
+	try {
+		var bz = new BezierCurve3();
+	} catch (e) {
+		ok(e instanceof IllegalArgumentError, "Throws error on empty constructor");	
 	}
 });
 
-test("No Points", function(){
+test("No Points", function () {
 	expect(1);
 
-	try{
-		new BezierCurve3([]);
-	}catch(e){
-		ok( e instanceof IllegalArgumentError, "Throws error when no control point are given." )	
+	try {
+		var bz = new BezierCurve3([]);
+	} catch (e) {
+		ok(e instanceof IllegalArgumentError, "Throws error when no control point are given.");	
 	}
 });
 
-test("Get Point", function(){
+test("Get Point", function () {
 	
-	var bc3 =  new BezierCurve3( [ new Dim3(0,0,0), new Dim3(1,1,1) ] );
+	var bc3 =  new BezierCurve3([new Dim3(0, 0, 0), new Dim3(1, 1, 1)]);
 	
 	var d1 = bc3.get_point(0);
 	var d2 = bc3.get_point(1);
 	var d3 = bc3.get_point(2);
 
 
-	ok(  d1, "D1 != null");
-	ok(  d2, "D2 != null");
-	ok( !d3, "D3 == null");
+	ok(d1, "D1 != null");
+	ok(d2, "D2 != null");
+	ok(!d3, "D3 == null");
 	ok(d1 !== d2,   "D1 !== D2");
 });
 
-test("Calculate - Simple", function(){
+test("Calculate - Simple", function () {
 
-	var bc3 =  new BezierCurve3( [ new Dim3(0,1,2), new Dim3(1,2,3) ] );
+	var bc3 =  new BezierCurve3([new Dim3(0, 1, 2), new Dim3(1, 2, 3)]);
 
 	var t0   = bc3.calculate(0);
 	var t0p5 = bc3.calculate(0.5);
