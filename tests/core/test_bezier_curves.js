@@ -29,6 +29,17 @@ test("No Points", function () {
 	}
 });
 
+test("No Link Constructor", function () {
+	
+	var l = [new BEZIER.core.Dim3(0, 0, 0), new BEZIER.core.Dim3(1, 1, 1)];
+	var bc3 =  new BEZIER.core.BezierCurve3(l);
+	
+	equal(bc3.num_points(), 2);
+	l.push(new BEZIER.core.Dim3(2, 2, 2));
+	equal(bc3.num_points(), 2);
+});
+
+
 test("Get Point", function () {
 	
 	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 0, 0), new BEZIER.core.Dim3(1, 1, 1)]);
