@@ -36,12 +36,13 @@ test("Get Point", function () {
 	var d1 = bc3.get_point(0);
 	var d2 = bc3.get_point(1);
 	var d3 = bc3.get_point(2);
-
+	var dn1 = bc3.get_point(-1);
 
 	ok(d1, "D1 != null");
 	ok(d2, "D2 != null");
 	ok(!d3, "D3 == null");
 	ok(d1 !== d2,   "D1 !== D2");
+	ok(!dn1, "D3 is not null");
 });
 
 test("Num Points - One", function () {
@@ -52,6 +53,32 @@ test("Num Points - One", function () {
 test("Num Points - Two", function () {
 	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(0, 1, 2)]);
 	equal(bc3.num_points(), 2, "Point Length");
+});
+
+test("Calculate - Negative T", function () {
+	expect(1);
+	
+	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(1, 2, 3)]);
+	
+	try {
+		bc3.calculate(-0.1);
+	} catch (e) {
+		ok(e instanceof BEZIER.errors.IllegalArgumentError, "T is out of range:" + e.message);	
+	}
+	
+});
+
+test("Calculate - T > 1", function () {
+	expect(1);
+	
+	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(1, 2, 3)]);
+	
+	try {
+		bc3.calculate(1.1);
+	} catch (e) {
+		ok(e instanceof BEZIER.errors.IllegalArgumentError, "T is out of range:" + e.message);		
+	}
+	
 });
 
 test("Calculate - Simple", function () {

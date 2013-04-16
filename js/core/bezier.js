@@ -2,11 +2,15 @@ var BEZIER = BEZIER || {};
 BEZIER.errors = BEZIER.errors || {};
 BEZIER.core = BEZIER.core || {};
 
-
 /////////////////////////
 //EXCEPTIONS
 /////////////////////////
-BEZIER.errors.IllegalArgumentError = function () {};
+BEZIER.errors.Error = function (message) {
+	this.message = message;
+};
+BEZIER.errors.IllegalArgumentError = function (message) {
+	BEZIER.errors.Error.call(this, message);
+};
 
 
 //////////////////////////
@@ -71,8 +75,12 @@ BEZIER.core.BezierCurve3.prototype.calculate = function (t) {
 	var x = [], 
 		y = [], 
 		z = [];
-	
 	var pt = null;
+	
+	if(t < 0 || t > 1){
+		throw new BEZIER.errors.IllegalArgumentError("T (" + t + ") argument is out of range: 0 < t < 1");	
+	}
+	
 	for (var i = 0; i < this.num_points(); i++) {
 		pt = this.get_point(i);
 		x.push(pt.x); 
