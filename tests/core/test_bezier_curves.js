@@ -44,6 +44,16 @@ test("Get Point", function () {
 	ok(d1 !== d2,   "D1 !== D2");
 });
 
+test("Num Points - One", function () {
+	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2)]);
+	equal(bc3.num_points(), 1, "Point Length");
+});
+
+test("Num Points - Two", function () {
+	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(0, 1, 2)]);
+	equal(bc3.num_points(), 2, "Point Length");
+});
+
 test("Calculate - Simple", function () {
 
 	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(1, 2, 3)]);
@@ -64,3 +74,4 @@ test("Calculate - Simple", function () {
 	equal(t1.y, 2);
 	equal(t1.z, 3);
 });
+
