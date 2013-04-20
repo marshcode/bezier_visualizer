@@ -13,9 +13,9 @@ test("Empty Constructor", function () {
 	expect(1);
 
 	try {
-		var bz = new BEZIER.core.BezierCurve3();
+		var bz = new BEZIER.core.beziercurve3();
 	} catch (e) {
-		ok(e instanceof BEZIER.errors.IllegalArgumentError, "Throws error on empty constructor");	
+		equal(e.type, "illegalargumenterror", "Throws error on empty constructor");	
 	}
 });
 
@@ -23,26 +23,26 @@ test("No Points", function () {
 	expect(1);
 
 	try {
-		var bz = new BEZIER.core.BezierCurve3([]);
+		var bz = new BEZIER.core.beziercurve3([]);
 	} catch (e) {
-		ok(e instanceof BEZIER.errors.IllegalArgumentError, "Throws error when no control point are given.");	
+		equal(e.type, "illegalargumenterror", "Throws error when no control point are given.");	
 	}
 });
 
 test("No Link Constructor", function () {
 	
-	var l = [new BEZIER.core.Dim3(0, 0, 0), new BEZIER.core.Dim3(1, 1, 1)];
-	var bc3 =  new BEZIER.core.BezierCurve3(l);
+	var l = [BEZIER.core.dim3(0, 0, 0), BEZIER.core.dim3(1, 1, 1)];
+	var bc3 =  new BEZIER.core.beziercurve3(l);
 	
 	equal(bc3.num_points(), 2);
-	l.push(new BEZIER.core.Dim3(2, 2, 2));
+	l.push(BEZIER.core.dim3(2, 2, 2));
 	equal(bc3.num_points(), 2);
 });
 
 
 test("Get Point", function () {
 	
-	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 0, 0), new BEZIER.core.Dim3(1, 1, 1)]);
+	var bc3 =  new BEZIER.core.beziercurve3([BEZIER.core.dim3(0, 0, 0), BEZIER.core.dim3(1, 1, 1)]);
 	
 	var d1 = bc3.get_point(0);
 	var d2 = bc3.get_point(1);
@@ -57,24 +57,24 @@ test("Get Point", function () {
 });
 
 test("Num Points - One", function () {
-	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2)]);
+	var bc3 =  new BEZIER.core.beziercurve3([BEZIER.core.dim3(0, 1, 2)]);
 	equal(bc3.num_points(), 1, "Point Length");
 });
 
 test("Num Points - Two", function () {
-	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(0, 1, 2)]);
+	var bc3 =  new BEZIER.core.beziercurve3([BEZIER.core.dim3(0, 1, 2), BEZIER.core.dim3(0, 1, 2)]);
 	equal(bc3.num_points(), 2, "Point Length");
 });
 
 test("Calculate - Negative T", function () {
 	expect(1);
 	
-	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(1, 2, 3)]);
+	var bc3 =  new BEZIER.core.beziercurve3([BEZIER.core.dim3(0, 1, 2), BEZIER.core.dim3(1, 2, 3)]);
 	
 	try {
 		bc3.calculate(-0.1);
 	} catch (e) {
-		ok(e instanceof BEZIER.errors.IllegalArgumentError, "T is out of range:" + e.message);	
+		equal(e.type, "illegalargumenterror", "T is out of range:" + e.message);	
 	}
 	
 });
@@ -82,19 +82,19 @@ test("Calculate - Negative T", function () {
 test("Calculate - T > 1", function () {
 	expect(1);
 	
-	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(1, 2, 3)]);
+	var bc3 =  new BEZIER.core.beziercurve3([BEZIER.core.dim3(0, 1, 2), BEZIER.core.dim3(1, 2, 3)]);
 	
 	try {
 		bc3.calculate(1.1);
 	} catch (e) {
-		ok(e instanceof BEZIER.errors.IllegalArgumentError, "T is out of range:" + e.message);		
+		equal(e.type, "illegalargumenterror", "T is out of range:" + e.message);		
 	}
 	
 });
 
 test("Calculate - Simple", function () {
 
-	var bc3 =  new BEZIER.core.BezierCurve3([new BEZIER.core.Dim3(0, 1, 2), new BEZIER.core.Dim3(1, 2, 3)]);
+	var bc3 =  new BEZIER.core.beziercurve3([new BEZIER.core.dim3(0, 1, 2), new BEZIER.core.dim3(1, 2, 3)]);
 
 	var t0   = bc3.calculate(0);
 	var t0p5 = bc3.calculate(0.5);
