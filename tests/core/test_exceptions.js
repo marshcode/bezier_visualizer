@@ -21,9 +21,9 @@ test("Testerror", function () {
 test("Testillegalargumentexception", function () {
 	expect(2);
 	try {
-		throw BEZIER.errors.illegalargumenterror("message");
+		throw BEZIER.errors.illegal_argument_error("message");
 	}catch (e) {
 		equal(e.message, "message");
-		equal(e.type, "illegalargumenterror");
+		equal(e.type, "illegal_argument_error");
 	}
 });

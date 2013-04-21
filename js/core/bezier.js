@@ -11,8 +11,8 @@ BEZIER.errors.error = function (type, message) {
 		message: message
 	};
 };
-BEZIER.errors.illegalargumenterror = function (message) {
-	return BEZIER.errors.error("illegalargumenterror", message);
+BEZIER.errors.illegal_argument_error = function (message) {
+	return BEZIER.errors.error("illegal_argument_error", message);
 };
 
 
@@ -59,10 +59,10 @@ BEZIER.core.bezier_calculation = function (points, t) {
 //Bezier Curve Classes
 ///////////////////////////////////////////
 
-BEZIER.core.beziercurve3 = function (control_points) {
+BEZIER.core.bezier_curve_3 = function (control_points) {
 
 	if (!control_points || control_points.length === 0) {
-		throw BEZIER.errors.illegalargumenterror("Must supply initial control points to curve.");
+		throw BEZIER.errors.illegal_argument_error("Must supply initial control points to curve.");
 	}
 	control_points = control_points.slice();
 	
@@ -83,7 +83,7 @@ BEZIER.core.beziercurve3 = function (control_points) {
 			var pt = null;
 			
 			if (t < 0 || t > 1) {
-				throw BEZIER.errors.illegalargumenterror("T (" + t + ") argument is out of range: 0 < t < 1");	
+				throw BEZIER.errors.illegal_argument_error("T (" + t + ") argument is out of range: 0 < t < 1");	
 			}
 			
 			for (var i = 0; i < this.num_points(); i++) {
