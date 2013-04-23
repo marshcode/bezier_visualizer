@@ -60,6 +60,7 @@
 													BEZIER.core.dim3(-5, 5, 0),
 													BEZIER.core.dim3(5,  5, 0),
 													BEZIER.core.dim3(5, -5, 0)] )
+			var radius = 0.25;
 
 			init();
 			animate();
@@ -92,6 +93,7 @@
 
 				//render curve:
 				//control polygon
+				var control_point_material =  new THREE.MeshLambertMaterial( { color: 0x0000ff, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
 				var control_polygon_material =  new THREE.MeshLambertMaterial( { color: 0x00ff00, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
 				var curve_material =  new THREE.MeshLambertMaterial( { color: 0xff0000, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
 				
@@ -99,21 +101,28 @@
 				var line, pt1, pt2;
 				var line1Geometry, line1Mesh;
 				var curve_path = new THREE.CurvePath();
+				var cpt;
+				
 				for(var i = 0; i < curve.num_points()-1; i++){
 					pt1 = curve.get_point(i);
 					pt2 = curve.get_point(i+1);
 				
 					line = new THREE.LineCurve3( new THREE.Vector3(pt1.x, pt1.y, pt1.z),
 				   							 	 new THREE.Vector3(pt2.x, pt2.y, pt2.z) );
-				   	lineGeometry = new THREE.TubeGeometry(line, 64, 1, 8, false)
+				   	lineGeometry = new THREE.TubeGeometry(line, 64, radius, 8, false)
 					lineMesh = new THREE.Mesh(lineGeometry, control_polygon_material);
-					
 					//scene.add(lineMesh);
+					
 					curve_path.add(line);
+					cpt = new THREE.Mesh( new THREE.SphereGeometry(radius * 1.5, 16, 16), control_point_material);
+					cpt.position.x = pt1.x;
+					cpt.position.y = pt1.y;
+					cpt.position.z = pt1.z;
+					scene.add(cpt);
 				}
 				
 				
-				var curve_path_mesh = new THREE.Mesh(new THREE.TubeGeometry(curve_path, 64, 0.25, 8, false), 
+				var curve_path_mesh = new THREE.Mesh(new THREE.TubeGeometry(curve_path, 64, radius, 8, false), 
 													 control_polygon_material);
 				scene.add(curve_path_mesh);
 
@@ -125,7 +134,7 @@
 					points.push( new THREE.Vector3(pt.x, pt.y, pt.z) )
 				}
 				var spline = new THREE.SplineCurve3(points);
-				var splineGeometry = new THREE.TubeGeometry(spline, 64, 0.25, 8, false);
+				var splineGeometry = new THREE.TubeGeometry(spline, 64, radius, 8, false);
 				var splineMesh = new THREE.Mesh(splineGeometry, curve_material);
 				scene.add(splineMesh);
 
