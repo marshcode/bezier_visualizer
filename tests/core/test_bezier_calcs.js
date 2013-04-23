@@ -4,9 +4,19 @@
 /*global ok */ 
 /*global fuzzy_equal */ 
 /*global BEZIER */
-
+/*global expect */
 
 module("Bezier Calculations - Binomial Coefficients");
+
+test("n=-1", function () {
+	expect(1);
+	try {
+		BEZIER.core.binomial_coefficients(-1);
+	} catch (e) {
+		equal(e.type, "illegal_argument_error", e.message);
+	}
+	
+});
 
 test("n=4", function () {
 	var C = BEZIER.core.binomial_coefficients(4);
@@ -37,6 +47,28 @@ test("n=6", function () {
 });					
 
 module("Bezier Calculations - Bezier Curves");	
+
+test("negative t", function () {
+	expect(1);
+	try {
+		BEZIER.core.bezier_calculation([0], -0.1);
+	} catch (e) {
+		equal(e.type, "illegal_argument_error", e.message);
+	}
+	
+	
+});
+
+test("no points", function () {
+	expect(1);
+	try {
+		BEZIER.core.bezier_calculation([], 0.1);
+	} catch (e) {
+		equal(e.type, "illegal_argument_error", e.message);
+	}
+	
+	
+});
 
 test("even distribution", function () {
 	var points = [0, 1,   2,   3,   4,   5,   6,   7,   8,   9,   10];

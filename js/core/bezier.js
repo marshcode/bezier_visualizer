@@ -35,6 +35,10 @@ BEZIER.core.dim3 = function (x, y, z) {
 //Calculates binomial coefficients for a single n.
 
 BEZIER.core.binomial_coefficients = function (n) {
+	if (n < 0) {
+		throw BEZIER.errors.illegal_argument_error("n (" + n + ") cannot be negative.");
+	}
+	
 	var C = [1];
 	for (var k = 0; k < n; ++ k) {
 		C[k + 1] = (C[k] * (n - k)) / (k + 1);
@@ -46,6 +50,13 @@ BEZIER.core.binomial_coefficients = function (n) {
 //calculates a single bezier curve at point t.
 BEZIER.core.bezier_calculation = function (points, t) {
 
+	if (t < 0 || t > 1) {
+		throw BEZIER.errors.illegal_argument_error("T (" + t + ") argument is out of range: 0 < t < 1");	
+	}
+	if( points.length === 0){
+		throw BEZIER.errors.illegal_argument_error("No control point given.");
+	}
+	
 	var n = points.length - 1;
 	var v = 0;
 	var C = BEZIER.core.binomial_coefficients(n); //very inefficient but whatever.  Caching can be handled later.
@@ -81,11 +92,7 @@ BEZIER.core.bezier_curve_3 = function (control_points) {
 				y = [], 
 				z = [];
 			var pt = null;
-			
-			if (t < 0 || t > 1) {
-				throw BEZIER.errors.illegal_argument_error("T (" + t + ") argument is out of range: 0 < t < 1");	
-			}
-			
+						
 			for (var i = 0; i < this.num_points(); i++) {
 				pt = this.get_point(i);
 				x.push(pt.x); 
