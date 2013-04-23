@@ -26,6 +26,7 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
       
       <!-- Source Includes -->
       <script src="/js/core/bezier.js"></script>
+      <script src="/js/widgets/visualizers.js"></script>
       <!-- Qunit -->
       <script src="/qunit/qunit.js"></script>
       <script src="/qunit/qunit_utils.js"></script>
