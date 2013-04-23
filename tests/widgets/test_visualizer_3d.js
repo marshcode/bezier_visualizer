@@ -70,7 +70,7 @@ test("get_set_override_clear_curve", function () {
 	ok(!viz3.get_curve("curve_one"), "curve has been cleared");
 });
 
-test("set_two_curves", function () {
+test("set_two_curves_get_curve_names", function () {
 	var viz3 = BEZIER.widgets.visualizer_3d();
 	var curve_one = create_curve(); 
 	var curve_two = create_curve(); 
