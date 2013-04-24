@@ -107,6 +107,7 @@ test("get_set_override_clear_curve_names", function () {
 module("Widgets - visualizer_3d - rendering strategies");
 
 test("render_solid_tube - basic - control points", function () {
+	var RENDER_MESHES = BEZIER.widgets.RENDER_MESHES;
 	var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0,   0, 0),
 											BEZIER.core.dim3(0,  10, 0),
 											BEZIER.core.dim3(10, 10, 0),
@@ -114,7 +115,7 @@ test("render_solid_tube - basic - control points", function () {
 	var radius = 2;
 	
 	var rendered = BEZIER.widgets.render_solid_tube(curve, radius);
-	var cpm = rendered.control_points;
+	var cpm = rendered[RENDER_MESHES.CONTROL_POINTS];
 	equal(cpm.children.length, 4);
 	
 	function assert_control_mesh(mesh, x, y, z, radius) {
@@ -130,4 +131,35 @@ test("render_solid_tube - basic - control points", function () {
 	assert_control_mesh(cpm.children[3], 10, 0, 0, radius * 1.5);
 	
 	
+});
+
+test("render_solid_tube - basic - polygon", function () {
+	var RENDER_MESHES = BEZIER.widgets.RENDER_MESHES;
+	var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0,   0, 0),
+											BEZIER.core.dim3(0,  10, 0),
+											BEZIER.core.dim3(10, 10, 0),
+											BEZIER.core.dim3(10, 0, 0)]);
+	
+	var radius = 2;
+	var rendered = BEZIER.widgets.render_solid_tube(curve, radius);
+	var polygon_mesh = rendered[RENDER_MESHES.CONTROL_POLYGON];
+	
+	equal(polygon_mesh.geometry.path.curves.length, 3, "assert number of curve");
+	equal(polygon_mesh.geometry.radius, radius, "assert radius");
+	
+	function assert_segment(segment, pt1, pt2) {
+		var t0 = segment.getPoint(0);
+		var t1 = segment.getPoint(1);
+		equal(t0.x, pt1.x);
+		equal(t0.y, pt1.y);
+		equal(t0.z, pt1.z);
+	
+		equal(t1.x, pt2.x);
+		equal(t1.y, pt2.y);
+		equal(t1.z, pt2.z);
+	}
+
+	assert_segment(polygon_mesh.geometry.path.curves[0], {x: 0, y: 0, z: 0}, {x: 0, y: 10, z: 0});
+	assert_segment(polygon_mesh.geometry.path.curves[1], {x: 0, y: 10, z: 0}, {x: 10, y: 10, z: 0});
+	assert_segment(polygon_mesh.geometry.path.curves[2], {x: 10, y: 10, z: 0}, {x: 10, y: 0, z: 0});
 });
