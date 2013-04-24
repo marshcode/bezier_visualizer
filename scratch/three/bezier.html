@@ -114,11 +114,6 @@
 					//scene.add(lineMesh);
 					
 					curve_path.add(line);
-					cpt = new THREE.Mesh( new THREE.SphereGeometry(radius * 1.5, 16, 16), control_point_material);
-					cpt.position.x = pt1.x;
-					cpt.position.y = pt1.y;
-					cpt.position.z = pt1.z;
-					scene.add(cpt);
 				}
 				
 				
@@ -138,6 +133,20 @@
 				var splineMesh = new THREE.Mesh(splineGeometry, curve_material);
 				scene.add(splineMesh);
 
+				//control points
+				var control_points = new THREE.Object3D();
+	
+				var control_point_geom = new THREE.SphereGeometry(radius * 1.5, 16, 16);
+				var cp, cp_mesh;
+				for (var i = 0; i < curve.num_points(); i++) {
+					cp = curve.get_point(i);
+					cp_mesh = new THREE.Mesh(control_point_geom, control_point_material);
+					cp_mesh.position.x = cp.x;
+					cp_mesh.position.y = cp.y;
+					cp_mesh.position.z = cp.z;
+					control_points.add(cp_mesh);
+				}
+				scene.add(control_points);
 				// lights
 
 				light = new THREE.DirectionalLight( 0xffffff );
