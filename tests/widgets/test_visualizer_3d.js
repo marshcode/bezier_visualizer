@@ -9,7 +9,7 @@
 
 module("Widgets - visualizer_3d");
 
-function create_curve(){
+function create_curve() {
 	//temporary curve object.  Good enough for tests now, can be extended when needed.
 	return {};
 }
@@ -102,4 +102,32 @@ test("get_set_override_clear_curve_names", function () {
 	assert_curve_name();
 	viz3.clear_curve("curve_one");
 	ok(viz3.get_curve_names().length === 0, "assert that the list is now empty.");
+});
+
+module("Widgets - visualizer_3d - rendering strategies");
+
+test("render_solid_tube - basic - control points", function () {
+	var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0,   0, 0),
+											BEZIER.core.dim3(0,  10, 0),
+											BEZIER.core.dim3(10, 10, 0),
+											BEZIER.core.dim3(10, 0, 0)]);
+	var radius = 2;
+	
+	var rendered = BEZIER.widgets.render_solid_tube(curve, radius);
+	var cpm = rendered.control_points;
+	equal(cpm.children.length, 4);
+	
+	function assert_control_mesh(mesh, x, y, z, radius) {
+		equal(mesh.geometry.radius, radius);
+		equal(mesh.position.x, x);
+		equal(mesh.position.y, y);
+		equal(mesh.position.z, z);
+	}
+	
+	assert_control_mesh(cpm.children[0], 0, 0, 0, radius * 1.5);
+	assert_control_mesh(cpm.children[1], 0, 10, 0, radius * 1.5);
+	assert_control_mesh(cpm.children[2], 10, 10, 0, radius * 1.5);
+	assert_control_mesh(cpm.children[3], 10, 0, 0, radius * 1.5);
+	
+	
 });
