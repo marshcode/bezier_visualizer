@@ -134,6 +134,8 @@
 				var splineGeometry = new THREE.TubeGeometry(spline, 64, radius, 8, false);
 				var splineMesh = new THREE.Mesh(splineGeometry, curve_material);
 				scene.add(splineMesh);
+				console.log(splineMesh);
+
 
 				//control points
 				var control_points = new THREE.Object3D();

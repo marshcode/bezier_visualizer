@@ -1,4 +1,5 @@
 /*global THREE */ 
+/*global assert */
 
 var BEZIER = BEZIER || {};
 BEZIER.widgets = BEZIER.widgets  || {};
@@ -49,13 +50,18 @@ BEZIER.widgets.visualizer_3d = function (num_points) {
 ////////////////////
 //Rendering Strategies
 ////////////////////
-BEZIER.widgets.RENDER_MESHES = {CONTROL_POINTS: 0, CONTROL_POLYGON: 1};
+BEZIER.widgets.RENDER_MESHES = {CONTROL_POINTS: 0, CONTROL_POLYGON: 1, CURVE: 2};
 
-BEZIER.widgets.render_solid_tube = function (curve, radius) {
+BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
+	assert(radius > 0, "radius must be greater than 0.");
+	assert(num_points > 0, "num_points must be greater than 0.");
+	
 	var RENDER_MESHES = BEZIER.widgets.RENDER_MESHES;
 	var control_point_material =  new THREE.MeshLambertMaterial({color: 0x0000ff, shading: THREE.SmoothShading});
 	var control_polygon_material =  new THREE.MeshLambertMaterial({color: 0x00ff00, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading});
+	var curve_material =  new THREE.MeshLambertMaterial( { color: 0xff0000, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
 
+	
 	//control points
 	var control_points = new THREE.Object3D();
 	var control_point_geom = new THREE.SphereGeometry(radius * 1.5, 16, 16);
@@ -85,8 +91,21 @@ BEZIER.widgets.render_solid_tube = function (curve, radius) {
 	
 	
 	
+	//curve
+	var points = [];
+	var pt;
+	var tdelta = 1 / num_points;
+	for (var t = 0; t <= 1; t += tdelta) {
+		pt = curve.calculate(t);
+		points.push(new THREE.Vector3(pt.x, pt.y, pt.z));
+	}
+	var spline = new THREE.SplineCurve3(points);
+	var spline_geometry = new THREE.TubeGeometry(spline, 64, radius, 8, false);
+	var curve_mesh = new THREE.Mesh(spline_geometry, curve_material);
+	
 	var meshes = {};
-	meshes[RENDER_MESHES.CONTROL_POINTS] = control_points;
+	meshes[RENDER_MESHES.CONTROL_POINTS]  = control_points;
 	meshes[RENDER_MESHES.CONTROL_POLYGON] = control_polygon;
+	meshes[RENDER_MESHES.CURVE]           = curve_mesh;
 	return meshes;
 };

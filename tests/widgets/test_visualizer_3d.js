@@ -113,8 +113,9 @@ test("render_solid_tube - basic - control points", function () {
 											BEZIER.core.dim3(10, 10, 0),
 											BEZIER.core.dim3(10, 0, 0)]);
 	var radius = 2;
+	var num_points = 100;
 	
-	var rendered = BEZIER.widgets.render_solid_tube(curve, radius);
+	var rendered = BEZIER.widgets.render_solid_tube(curve, radius, num_points);
 	var cpm = rendered[RENDER_MESHES.CONTROL_POINTS];
 	equal(cpm.children.length, 4);
 	
@@ -141,7 +142,8 @@ test("render_solid_tube - basic - polygon", function () {
 											BEZIER.core.dim3(10, 0, 0)]);
 	
 	var radius = 2;
-	var rendered = BEZIER.widgets.render_solid_tube(curve, radius);
+	var num_points = 100;
+	var rendered = BEZIER.widgets.render_solid_tube(curve, radius, num_points);
 	var polygon_mesh = rendered[RENDER_MESHES.CONTROL_POLYGON];
 	
 	equal(polygon_mesh.geometry.path.curves.length, 3, "assert number of curve");
@@ -162,4 +164,34 @@ test("render_solid_tube - basic - polygon", function () {
 	assert_segment(polygon_mesh.geometry.path.curves[0], {x: 0, y: 0, z: 0}, {x: 0, y: 10, z: 0});
 	assert_segment(polygon_mesh.geometry.path.curves[1], {x: 0, y: 10, z: 0}, {x: 10, y: 10, z: 0});
 	assert_segment(polygon_mesh.geometry.path.curves[2], {x: 10, y: 10, z: 0}, {x: 10, y: 0, z: 0});
+});
+
+test("render_solid_tube - basic - curve at 100 points", function () {
+	var RENDER_MESHES = BEZIER.widgets.RENDER_MESHES;
+	var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0,   0, 0),
+											BEZIER.core.dim3(0,  10, 0),
+											BEZIER.core.dim3(10, 10, 0),
+											BEZIER.core.dim3(10, 0, 0)]);
+	
+	var radius = 2;
+	var num_points = 100;
+	var rendered = BEZIER.widgets.render_solid_tube(curve, radius, num_points);
+	var curve_mesh = rendered[RENDER_MESHES.CURVE];
+	
+	equal(curve_mesh.geometry.path.points.length, num_points);
+});
+
+test("render_solid_tube - basic - curve at 1000 points", function () {
+	var RENDER_MESHES = BEZIER.widgets.RENDER_MESHES;
+	var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0,   0, 0),
+											BEZIER.core.dim3(0,  10, 0),
+											BEZIER.core.dim3(10, 10, 0),
+											BEZIER.core.dim3(10, 0, 0)]);
+	
+	var radius = 2;
+	var num_points = 1000;
+	var rendered = BEZIER.widgets.render_solid_tube(curve, radius, num_points);
+	var curve_mesh = rendered[RENDER_MESHES.CURVE];
+	
+	equal(curve_mesh.geometry.path.points.length, num_points);
 });
