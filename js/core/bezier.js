@@ -5,11 +5,10 @@ BEZIER.core = BEZIER.core || {};
 /////////////////////////
 //EXCEPTIONS
 /////////////////////////
-BEZIER.errors.error = function (type, message) {
-	return {
-		type: type,
-		message: message
-	};
+BEZIER.errors.error = function (name, message) {
+	var e = new Error(message);
+	e.name = name;
+	return e;
 };
 BEZIER.errors.illegal_argument_error = function (message) {
 	return BEZIER.errors.error("illegal_argument_error", message);

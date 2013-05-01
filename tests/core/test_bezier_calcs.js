@@ -13,7 +13,7 @@ test("n=-1", function () {
 	try {
 		BEZIER.core.binomial_coefficients(-1);
 	} catch (e) {
-		equal(e.type, "illegal_argument_error", e.message);
+		equal(e.name, "illegal_argument_error", e.message);
 	}
 	
 });
@@ -53,7 +53,7 @@ test("negative t", function () {
 	try {
 		BEZIER.core.bezier_calculation([0], -0.1);
 	} catch (e) {
-		equal(e.type, "illegal_argument_error", e.message);
+		equal(e.name, "illegal_argument_error", e.message);
 	}
 	
 	
@@ -64,7 +64,7 @@ test("no points", function () {
 	try {
 		BEZIER.core.bezier_calculation([], 0.1);
 	} catch (e) {
-		equal(e.type, "illegal_argument_error", e.message);
+		equal(e.name, "illegal_argument_error", e.message);
 	}
 	
 	

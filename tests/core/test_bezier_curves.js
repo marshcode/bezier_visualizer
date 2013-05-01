@@ -15,7 +15,7 @@ test("Empty Constructor", function () {
 	try {
 		var bz = BEZIER.core.bezier_curve_3();
 	} catch (e) {
-		equal(e.type, "illegal_argument_error", "Throws error on empty constructor");	
+		equal(e.name, "illegal_argument_error", "Throws error on empty constructor");	
 	}
 });
 
@@ -25,7 +25,7 @@ test("No Points", function () {
 	try {
 		var bz = BEZIER.core.bezier_curve_3([]);
 	} catch (e) {
-		equal(e.type, "illegal_argument_error", "Throws error when no control point are given.");	
+		equal(e.name, "illegal_argument_error", "Throws error when no control point are given.");	
 	}
 });
 
@@ -74,7 +74,7 @@ test("Calculate - Negative T", function () {
 	try {
 		bc3.calculate(-0.1);
 	} catch (e) {
-		equal(e.type, "illegal_argument_error", "T is out of range:" + e.message);	
+		equal(e.name, "illegal_argument_error", "T is out of range:" + e.message);	
 	}
 	
 });
@@ -87,7 +87,7 @@ test("Calculate - T > 1", function () {
 	try {
 		bc3.calculate(1.1);
 	} catch (e) {
-		equal(e.type, "illegal_argument_error", "T is out of range:" + e.message);		
+		equal(e.name, "illegal_argument_error", "T is out of range:" + e.message);		
 	}
 	
 });

@@ -14,7 +14,7 @@ test("Testerror", function () {
 		throw BEZIER.errors.error("type1", "message");
 	}catch (e) {
 		equal(e.message, "message");
-		equal(e.type,    "type1");
+		equal(e.name,    "type1");
 	}
 });
 
@@ -24,6 +24,6 @@ test("Testillegalargumentexception", function () {
 		throw BEZIER.errors.illegal_argument_error("message");
 	}catch (e) {
 		equal(e.message, "message");
-		equal(e.type, "illegal_argument_error");
+		equal(e.name, "illegal_argument_error");
 	}
 });
