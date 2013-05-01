@@ -11,8 +11,26 @@ BEZIER.errors.error = function (name, message) {
 	return e;
 };
 BEZIER.errors.illegal_argument_error = function (message) {
-	return BEZIER.errors.error("illegal_argument_error", message);
+	return BEZIER.errors.error("IllegalArgumentError", message);
 };
+
+//leaving this in the global namespace for convenience purposes.
+function assert(condition, message) {
+	
+	if (condition) {
+		return;
+	}
+	
+    if (window.console) {
+        var console_message = "Assertion Violation: " + (message || "");
+        console.group(console_message);
+        console.trace();
+        console.groupEnd(console_message);
+    }
+    
+    throw BEZIER.errors.error("AssertionError", message);
+	
+}
 
 
 //////////////////////////
@@ -34,9 +52,8 @@ BEZIER.core.dim3 = function (x, y, z) {
 //Calculates binomial coefficients for a single n.
 
 BEZIER.core.binomial_coefficients = function (n) {
-	if (n < 0) {
-		throw BEZIER.errors.illegal_argument_error("n (" + n + ") cannot be negative.");
-	}
+	assert(n >= 0, "n (" + n + ") cannot be negative.");
+	
 	
 	var C = [1];
 	for (var k = 0; k < n; ++ k) {
@@ -49,12 +66,8 @@ BEZIER.core.binomial_coefficients = function (n) {
 //calculates a single bezier curve at point t.
 BEZIER.core.bezier_calculation = function (points, t) {
 
-	if (t < 0 || t > 1) {
-		throw BEZIER.errors.illegal_argument_error("T (" + t + ") argument is out of range: 0 < t < 1");	
-	}
-	if( points.length === 0){
-		throw BEZIER.errors.illegal_argument_error("No control point given.");
-	}
+	assert(t >= 0 && t <= 1, "T (" + t + ") argument is out of range: 0 < t < 1");
+	assert(points.length > 0, "No control point given.");
 	
 	var n = points.length - 1;
 	var v = 0;
@@ -92,6 +105,10 @@ BEZIER.core.bezier_curve_3 = function (control_points) {
 				z = [];
 			var pt = null;
 						
+			if( t < 0 || t > 1 ){
+				throw BEZIER.errors.illegal_argument_error("T (" + t + ") argument is out of range: 0 < t < 1");
+			}
+			
 			for (var i = 0; i < this.num_points(); i++) {
 				pt = this.get_point(i);
 				x.push(pt.x); 

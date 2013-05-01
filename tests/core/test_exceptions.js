@@ -5,8 +5,9 @@
 /*global fuzzy_equal */ 
 /*global BEZIER */
 /*global expect */
+/*global assert */
 
-module("TestDim3");
+module("TestException");
 
 test("Testerror", function () {
 	expect(2);
@@ -24,6 +25,24 @@ test("Testillegalargumentexception", function () {
 		throw BEZIER.errors.illegal_argument_error("message");
 	}catch (e) {
 		equal(e.message, "message");
-		equal(e.name, "illegal_argument_error");
+		equal(e.name, "IllegalArgumentError");
 	}
+});
+
+test("TestAssertionFalse", function () {
+	expect(2);
+	try {
+		assert(false, "message");	
+	} catch (e) {
+		equal(e.message, "message");
+		equal(e.name, "AssertionError");
+	}
+	
+	
+});
+
+test("TestAssertionTrue", function () {
+	expect(0);
+	assert(true, "message");
+	
 });
