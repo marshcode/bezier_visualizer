@@ -59,7 +59,7 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 	var RENDER_MESHES = BEZIER.widgets.RENDER_MESHES;
 	var control_point_material =  new THREE.MeshLambertMaterial({color: 0x0000ff, shading: THREE.SmoothShading});
 	var control_polygon_material =  new THREE.MeshLambertMaterial({color: 0x00ff00, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading});
-	var curve_material =  new THREE.MeshLambertMaterial( { color: 0xff0000, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
+	var curve_material =  new THREE.MeshLambertMaterial({ color: 0xff0000, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading });
 
 	
 	//control points
