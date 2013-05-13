@@ -28,16 +28,31 @@
 			a {
 				color: red;
 			}
+			
+			canvas#canvas_2d{
+				width:30em;height;30em;
+				border:solid thin black;
+				position:absolute; 
+				left:0;
+				top:10em;
+			}
+			
 		</style>
 	</head>
 
 	<body>
+		
+		<!--  
+		<canvas id="canvas_2d">
+		
+		</canvas>
+		-->
+	
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 		</div>
-
 
 		<script src="/lib/three/three.js"></script>
 		<script src="/lib/three/TrackballControls.js"></script>
@@ -173,6 +188,7 @@
 
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
+	
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -211,10 +227,15 @@
 				renderer.render( scene, camera );
 				stats.update();
 
+				//var ctx = document.getElementById("canvas_2d").getContext("2d");
+				//ctx.fillRect(50, 25, 150, 100);
+
 			}
 
 
 		</script>
+
+
 
 	</body>
 </html>
