@@ -195,3 +195,26 @@ test("render_solid_tube - basic - curve at 1000 points", function () {
 	
 	equal(curve_mesh.geometry.path.points.length, num_points);
 });
+
+
+module("Widgets - visualizer_3d - scene strategies");
+
+test("stage_basic - no params", function () {
+	
+	var stage = BEZIER.widgets.stage_basic(100, 200);
+	ok(stage.scene);
+	ok(stage.scene.fog);
+
+	
+	
+	ok(stage.camera);
+	ok(stage.camera_controls);
+	equal(stage.camera_controls.noZoom, false);
+	equal(stage.camera_controls.noPan, false);
+	
+	
+	ok(stage.renderer);
+	equal(stage.renderer.domElement.width, 100);
+	equal(stage.renderer.domElement.height, 200);
+	
+});

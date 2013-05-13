@@ -108,3 +108,45 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 	meshes["curve"]           = curve_mesh;
 	return meshes;
 };
+
+/////////////////////////
+//STAGE STRATEGIES
+/////////////////////////
+BEZIER.widgets.stage_basic = function (width, height) {
+	var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
+	var controls = new THREE.TrackballControls(camera);
+	var scene = new THREE.Scene();
+	scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+	
+	controls.noZoom = false;
+	controls.noPan = false;
+	
+	// lights
+
+	var light = new THREE.DirectionalLight(0xffffff);
+	light.position.set(1, 1, 1);
+	scene.add(light);
+
+	light = new THREE.DirectionalLight(0xffffff);
+	light.position.set(-1, -1, -1);
+	scene.add(light);
+
+	light = new THREE.AmbientLight(0xffffff);
+	scene.add(light);
+
+
+	// renderer
+
+	var renderer = new THREE.WebGLRenderer({antialias: false});
+	renderer.setClearColor(scene.fog.color, 1);
+	renderer.setSize(width, height);
+	
+	return {
+		camera:          camera,
+		camera_controls: controls,
+		scene:           scene,
+		renderer:        renderer
+
+	};
+	
+};
