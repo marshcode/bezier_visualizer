@@ -50,7 +50,6 @@ BEZIER.widgets.visualizer_3d = function (num_points) {
 ////////////////////
 //Rendering Strategies
 ////////////////////
-BEZIER.widgets.RENDER_MESHES = {CONTROL_POINTS: 0, CONTROL_POLYGON: 1, CURVE: 2};
 
 BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 	assert(radius > 0, "radius must be greater than 0.");
@@ -104,8 +103,8 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 	var curve_mesh = new THREE.Mesh(spline_geometry, curve_material);
 	
 	var meshes = {};
-	meshes[RENDER_MESHES.CONTROL_POINTS]  = control_points;
-	meshes[RENDER_MESHES.CONTROL_POLYGON] = control_polygon;
-	meshes[RENDER_MESHES.CURVE]           = curve_mesh;
+	meshes["control_points"]  = control_points;
+	meshes["control_polygon"] = control_polygon;
+	meshes["curve"]           = curve_mesh;
 	return meshes;
 };
