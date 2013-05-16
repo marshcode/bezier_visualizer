@@ -115,36 +115,44 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 BEZIER.widgets.stage_basic = function (width, height) {
 	var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
 	var controls = new THREE.TrackballControls(camera);
-	var scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+	var clear_color = 0xcccccc;
 	
 	controls.noZoom = false;
 	controls.noPan = false;
 	
-	// lights
+	function make_scene(){
+		var scene = new THREE.Scene();
+		scene.fog = new THREE.FogExp2(clear_color, 0.002);
+		
+		var light = new THREE.DirectionalLight(0xffffff);
+		light.position.set(1, 1, 1);
+		scene.add(light);
 
-	var light = new THREE.DirectionalLight(0xffffff);
-	light.position.set(1, 1, 1);
-	scene.add(light);
+		light = new THREE.DirectionalLight(0xffffff);
+		light.position.set(-1, -1, -1);
+		scene.add(light);
 
-	light = new THREE.DirectionalLight(0xffffff);
-	light.position.set(-1, -1, -1);
-	scene.add(light);
+		light = new THREE.AmbientLight(0xffffff);
+		scene.add(light);
+		
+		return scene;
+		
+	}
 
-	light = new THREE.AmbientLight(0xffffff);
-	scene.add(light);
+
+
 
 
 	// renderer
 
 	var renderer = new THREE.WebGLRenderer({antialias: false});
-	renderer.setClearColor(scene.fog.color, 1);
+	renderer.setClearColor(clear_color, 1);
 	renderer.setSize(width, height);
 	
 	return {
 		camera:          camera,
 		camera_controls: controls,
-		scene:           scene,
+		make_scene:           make_scene,
 		renderer:        renderer
 
 	};

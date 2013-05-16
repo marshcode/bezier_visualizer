@@ -202,10 +202,11 @@ module("Widgets - visualizer_3d - scene strategies");
 test("stage_basic - no params", function () {
 	
 	var stage = BEZIER.widgets.stage_basic(100, 200);
-	ok(stage.scene);
-	ok(stage.scene.fog);
-
+	var scene = stage.make_scene();
 	
+	ok(scene);
+	ok(scene.fog);
+	//FIXME: I should be testing the components I added but I have no intelligent way of doing that.
 	
 	ok(stage.camera);
 	ok(stage.camera_controls);
@@ -216,5 +217,16 @@ test("stage_basic - no params", function () {
 	ok(stage.renderer);
 	equal(stage.renderer.domElement.width, 100);
 	equal(stage.renderer.domElement.height, 200);
+	
+});
+
+test("stage_basic - make_scene new_instance", function () {
+	
+	var stage = BEZIER.widgets.stage_basic(100, 200);
+	var sceneA = stage.make_scene();
+	var sceneB = stage.make_scene();
+	
+	
+	ok(sceneA !== sceneB, "make_scene must be return different objects.");
 	
 });
