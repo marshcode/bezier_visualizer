@@ -103,9 +103,9 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 	var curve_mesh = new THREE.Mesh(spline_geometry, curve_material);
 	
 	var meshes = {};
-	meshes["control_points"]  = control_points;
-	meshes["control_polygon"] = control_polygon;
-	meshes["curve"]           = curve_mesh;
+	meshes.control_points  = control_points;
+	meshes.control_polygon = control_polygon;
+	meshes.curve           = curve_mesh;
 	return meshes;
 };
 
