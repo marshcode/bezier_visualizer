@@ -1,3 +1,5 @@
+/*global console, window */
+
 var BEZIER = BEZIER || {};
 BEZIER.errors = BEZIER.errors || {};
 BEZIER.core = BEZIER.core || {};
@@ -66,7 +68,7 @@ BEZIER.core.binomial_coefficients = function (n) {
 //calculates a single bezier curve at point t.
 BEZIER.core.bezier_calculation = function (points, t) {
 
-	assert(t >= 0 && t <= 1, "T (" + t + ") argument is out of range: 0 < t < 1");
+	assert(t >= 0 && t <= 1, "T (" + t + ") argument is out of range: 0 <= t <= 1");
 	assert(points.length > 0, "No control point given.");
 	
 	var n = points.length - 1;

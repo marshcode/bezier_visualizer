@@ -9,6 +9,16 @@
 
 module("TestException");
 
+test("Empty Error", function () {
+	expect(2);
+	try {
+		throw BEZIER.errors.error();
+	}catch (e) {
+		ok(!e.message);
+		ok(!e.name); //would be strange but throwing an error when throwing an error seems backwards.
+	}
+});
+
 test("Testerror", function () {
 	expect(2);
 	try {
@@ -41,8 +51,32 @@ test("TestAssertionFalse", function () {
 	
 });
 
+test("TestAssertFalseNoMessage", function () {
+	expect(1);
+	try {
+		assert(false);	
+	} catch (e) {
+		ok(!e.message);
+	}
+});
+
+test("TestAssertFalsy", function (){
+	expect(1);
+	try {
+		assert(null);	
+	} catch (e) {
+		ok(true, 'just making sure the exception happens');
+	}
+})
+
 test("TestAssertionTrue", function () {
 	expect(0);
 	assert(true, "message");
+	
+});
+
+test("TestAssertionTruthy", function () {
+	expect(0);
+	assert({}, "message");
 	
 });

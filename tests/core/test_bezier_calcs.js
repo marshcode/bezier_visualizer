@@ -59,6 +59,17 @@ test("negative t", function () {
 	
 });
 
+test("greater than 1 t", function () {
+	expect(1);
+	try {
+		BEZIER.core.bezier_calculation([0], 1.1);
+	} catch (e) {
+		equal(e.name, "AssertionError", e.message);
+	}
+	
+	
+});
+
 test("no points", function () {
 	expect(1);
 	try {

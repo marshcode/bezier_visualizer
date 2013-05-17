@@ -38,3 +38,11 @@ test("ZeroInit", function () {
 	equal(d.y, 0, "Assert Y Coordinate");
 	equal(d.z, 0, "Assert Z Coordinate");
 });
+
+test("NegativeInit", function () {
+
+	var d = BEZIER.core.dim3(-1, -2, -3);
+	equal(d.x, -1, "Assert X Coordinate");
+	equal(d.y, -2, "Assert Y Coordinate");
+	equal(d.z, -3, "Assert Z Coordinate");
+});
