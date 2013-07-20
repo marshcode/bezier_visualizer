@@ -14,6 +14,7 @@ BEZIER.widgets.visualizer_3d = function (num_points) {
 	
 	num_points = num_points || 100;
 	var curves = {};
+	var stage = BEZIER.widgets.stage_basic();
 	
 	return {
 		get_num_points: function () {
@@ -34,11 +35,13 @@ BEZIER.widgets.visualizer_3d = function (num_points) {
 			return l;
 		},
 		
-		get_curve: function (name) {
-			return curves[name];
+		has_curve: function (name) {
+			return name in curves;
 		},
+		
 		set_curve: function (name, curve) {
-			curves[name] = curve;
+			var radius = 0.25; //hard coded for beta-1.  
+			curves[name] = BEZIER.widgets.render_solid_tube(curve, radius, num_points);
 		},
 		clear_curve: function (name) {
 			delete curves[name];
@@ -119,7 +122,7 @@ BEZIER.widgets.stage_basic = function (width, height) {
 	controls.noZoom = false;
 	controls.noPan = false;
 	
-	function make_scene(){
+	function make_scene() {
 		var scene = new THREE.Scene();
 		scene.fog = new THREE.FogExp2(clear_color, 0.002);
 		

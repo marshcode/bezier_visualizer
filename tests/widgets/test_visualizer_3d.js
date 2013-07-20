@@ -3,6 +3,7 @@
 /*global equal */ 
 /*global ok */ 
 /*global expect */
+/*global throws */
 /*global fuzzy_equal */ 
 /*global BEZIER */ 
 
@@ -10,8 +11,8 @@
 module("Widgets - visualizer_3d");
 
 function create_curve() {
-	//temporary curve object.  Good enough for tests now, can be extended when needed.
-	return {};
+	//Real curve object.  Now required since the visualizer is trying to render the gemetries
+	return BEZIER.core.bezier_curve_3( [BEZIER.core.dim3(0, 0, 0), BEZIER.core.dim3(1, 1, 1)] );
 }
 
 test("Empty Constructor", function () {
@@ -32,17 +33,18 @@ test("get set num points", function () {
 	
 });
 
-test("get no curve", function () {
+test("has no curve", function () {
 	var viz3 = BEZIER.widgets.visualizer_3d();
-	ok(!viz3.get_curve("curve1"), "empty curves return nothing");
+	ok(!viz3.has_curve("curve1"), "empty curves return nothing");
 });
 
 test("clear no curve", function () {
 	var viz3 = BEZIER.widgets.visualizer_3d();
-	ok(!viz3.get_curve("curve_one"), "no curve exists");
+	ok(!viz3.has_curve("curve_one"), "no curve exists");
 	viz3.clear_curve("curve_one");
-	ok(!viz3.get_curve("curve_one"), "curve still does not exist.");
+	ok(!viz3.has_curve("curve_one"), "curve still does not exist.");
 });
+
 
 test("set_two_curves", function () {
 	var viz3 = BEZIER.widgets.visualizer_3d();
@@ -52,8 +54,10 @@ test("set_two_curves", function () {
 	viz3.set_curve("curve_one", curve_one);
 	viz3.set_curve("curve_two", curve_two);
 	
-	ok(viz3.get_curve("curve_one") === curve_one);
-	ok(viz3.get_curve("curve_two") === curve_two);
+	//currently no good way to check the rendered objects
+	//just make sure everything passes
+	ok(viz3.has_curve("curve_one")); 
+	ok(viz3.has_curve("curve_two"));
 });
 
 test("get_set_override_clear_curve", function () {
@@ -63,11 +67,11 @@ test("get_set_override_clear_curve", function () {
 	
 	ok(curve_one !== curve_one_prime, "pre-test, two curves do not equal each other.");
 	viz3.set_curve("curve_one", curve_one);
-	ok(curve_one === viz3.get_curve("curve_one"), "make sure it returns the exact same curve object");
+	ok(viz3.has_curve("curve_one"), "make sure it returns the exact same curve object");
 	viz3.set_curve("curve_one", curve_one_prime);
-	ok(curve_one_prime === viz3.get_curve("curve_one"), "make sure it returns the new curve object");
+	ok(viz3.has_curve("curve_one"), "make sure it returns the new curve object");
 	viz3.clear_curve("curve_one");
-	ok(!viz3.get_curve("curve_one"), "curve has been cleared");
+	ok(!viz3.has_curve("curve_one"), "curve has been cleared");
 });
 
 test("set_two_curves_get_curve_names", function () {
@@ -164,6 +168,25 @@ test("render_solid_tube - basic - polygon", function () {
 	assert_segment(polygon_mesh.geometry.path.curves[0], {x: 0, y: 0, z: 0}, {x: 0, y: 10, z: 0});
 	assert_segment(polygon_mesh.geometry.path.curves[1], {x: 0, y: 10, z: 0}, {x: 10, y: 10, z: 0});
 	assert_segment(polygon_mesh.geometry.path.curves[2], {x: 10, y: 10, z: 0}, {x: 10, y: 0, z: 0});
+});
+
+test("render_solid_tube - basic - curve with two identical control points", function () {
+	var RENDER_MESHES = BEZIER.widgets.RENDER_MESHES;
+	var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(1, 1, 1),
+											BEZIER.core.dim3(1, 1, 1)]);
+	
+	var radius = 2;
+	var num_points = 100;
+	
+	throws(
+	    function () {
+                BEZIER.widgets.render_solid_tube(curve, radius, num_points);
+	        },
+		"Error expected when two points are identical"
+    );
+	
+	
+
 });
 
 test("render_solid_tube - basic - curve at 100 points", function () {
