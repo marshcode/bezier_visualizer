@@ -11,8 +11,18 @@
 module("Widgets - visualizer_3d");
 
 function create_curve() {
-	//Real curve object.  Now required since the visualizer is trying to render the gemetries
-	return BEZIER.core.bezier_curve_3( [BEZIER.core.dim3(0, 0, 0), BEZIER.core.dim3(1, 1, 1)] );
+	//Real curve object.  Now required since the visualizer is trying to render the geometries
+	return BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0, 0, 0), BEZIER.core.dim3(1, 1, 1)]);
+}
+
+function instrumented_renderer() {
+	return {
+		stack: [],
+		instrument: function (curve, radius, num_points) {
+			this.stack.push([curve, radius, num_points]);
+			return {};//not returning anything useful here.  Might come back to bite us?
+		}
+	};
 }
 
 test("Empty Constructor", function () {
@@ -45,6 +55,49 @@ test("clear no curve", function () {
 	ok(!viz3.has_curve("curve_one"), "curve still does not exist.");
 });
 
+
+test("set_curve with i/r and num_point change", function () {
+	
+	var i_r = instrumented_renderer();
+	var num_points_1 = 300;
+	var num_points_2 = 400;
+	
+	
+	var viz3 = BEZIER.widgets.visualizer_3d(num_points_1, null, null, null, i_r.instrument.bind(i_r));
+	var curve_one = create_curve();
+	
+	equal(i_r.stack.length, 0, "i_r stack has no calls on it.");
+	
+	viz3.set_curve("curve_one", curve_one);
+	viz3.set_num_points(num_points_2);
+	viz3.set_curve("curve_one", curve_one);
+	
+	equal(i_r.stack.length, 2, "i_r stack has two calls on it.");
+	
+	equal(i_r.stack[0][2], num_points_1, "assert that the original num_points was used.");
+	equal(i_r.stack[1][2], num_points_2, "assert that the new num_points was used.");
+	
+});
+
+test("set_curve with instrumented renderer", function () {
+	
+
+	var i_r = instrumented_renderer();
+	 
+	var viz3 = BEZIER.widgets.visualizer_3d(null, null, null, null, i_r.instrument.bind(i_r));
+	var curve_one = create_curve();
+	
+	equal(i_r.stack.length, 0, "instrumented renderer is empty");
+	viz3.set_curve("curve_one", curve_one);
+	ok(viz3.has_curve("curve_one"), "curve placed into renderer");
+	equal(i_r.stack.length, 1, "instrumented renderer has one item");
+	
+	var curve_info = i_r.stack[0];
+	ok(curve_one === curve_info[0], "proper curve object passed in.");
+	equal(typeof curve_info[1], "number", "radius is a number");
+	equal(curve_info[2], viz3.get_num_points(), "number of rendered points set equal to visualizer points.")
+	
+});
 
 test("set_two_curves", function () {
 	var viz3 = BEZIER.widgets.visualizer_3d();
@@ -126,6 +179,10 @@ test("get_dom_element_given_height", function () {
 	
 });
 
+test("test_render", function () {
+	ok(false, "failed so I will write the test.")
+	
+});
 
 module("Widgets - visualizer_3d - rendering strategies");
 

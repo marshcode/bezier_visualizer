@@ -10,11 +10,15 @@ BEZIER.widgets = BEZIER.widgets  || {};
 //main interface to THREE.js
 ///////////////////////
 
-BEZIER.widgets.visualizer_3d = function (num_points, width, height) {
+BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factory, curve_factory) {
 	
 	num_points = num_points || 100;
+	stage_factory = stage_factory || BEZIER.widgets.stage_basic;
+	curve_factory = curve_factory || BEZIER.widgets.render_solid_tube;
+	
+	
 	var curves = {};
-	var stage = BEZIER.widgets.stage_basic(width || 500, height || 500);
+	var stage = stage_factory(width || 500, height || 500);
 	
 	return {
 		/////////POINTS//////////
@@ -42,8 +46,8 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height) {
 		},
 		
 		set_curve: function (name, curve) {
-			var radius = 0.25; //hard coded for beta-1.  
-			curves[name] = BEZIER.widgets.render_solid_tube(curve, radius, num_points);
+			var radius = 0.25; //FIXME: hard coded for beta-1.  
+			curves[name] = curve_factory(curve, radius, this.get_num_points());
 		},
 		clear_curve: function (name) {
 			delete curves[name];
