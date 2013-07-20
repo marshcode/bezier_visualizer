@@ -108,6 +108,25 @@ test("get_set_override_clear_curve_names", function () {
 	ok(viz3.get_curve_names().length === 0, "assert that the list is now empty.");
 });
 
+test("get_dom_element_default_height", function () {
+	var viz3 = BEZIER.widgets.visualizer_3d();
+	var elm = viz3.get_dom_element()
+	equal(elm.tagName.toLowerCase(), "canvas");
+	equal(elm.width, 500);
+	equal(elm.height, 500);
+	
+});
+
+test("get_dom_element_given_height", function () {
+	var viz3 = BEZIER.widgets.visualizer_3d(100, 200, 300);
+	var elm = viz3.get_dom_element()
+	equal(elm.tagName.toLowerCase(), "canvas");
+	equal(elm.width, 200);
+	equal(elm.height, 300);
+	
+});
+
+
 module("Widgets - visualizer_3d - rendering strategies");
 
 test("render_solid_tube - basic - control points", function () {

@@ -10,13 +10,14 @@ BEZIER.widgets = BEZIER.widgets  || {};
 //main interface to THREE.js
 ///////////////////////
 
-BEZIER.widgets.visualizer_3d = function (num_points) {
+BEZIER.widgets.visualizer_3d = function (num_points, width, height) {
 	
 	num_points = num_points || 100;
 	var curves = {};
-	var stage = BEZIER.widgets.stage_basic();
+	var stage = BEZIER.widgets.stage_basic(width || 500, height || 500);
 	
 	return {
+		/////////POINTS//////////
 		get_num_points: function () {
 			return num_points;
 		},
@@ -25,6 +26,7 @@ BEZIER.widgets.visualizer_3d = function (num_points) {
 			num_points = num;
 		},
 	
+		/////////CURVES/////////
 		get_curve_names: function (name) {
 			var l = [];
 			for (var key in curves) {
@@ -45,7 +47,30 @@ BEZIER.widgets.visualizer_3d = function (num_points) {
 		},
 		clear_curve: function (name) {
 			delete curves[name];
+		},
+		////////RENDERING////////////
+		get_dom_element: function () {
+			return stage.renderer.domElement;
+		},
+		render: function () {
+			var scene = stage.make_scene();
+			var curve_names = this.get_curve_names();
+			
+			curve_names.forEach( function(curve_name){
+				var mesh = curves[curve_name];
+				
+				meshes.control_points  = control_points;
+				meshes.control_polygon = control_polygon;
+				meshes.curve           = curve_mesh;
+				
+				scene.add(mesh.control_points);
+				scene.add(mesh.control_polygon);
+				scene.add(mesh.curve);
+			});			
+			
+			stage.renderer.render(scene, stage.camera);
 		}
+		
 	};
 	
 };
