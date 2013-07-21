@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - trackball controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#000;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: red;
+			}
+			
+			canvas#canvas_2d{
+				width:30em;height;30em;
+				border:solid thin black;
+				position:absolute; 
+				left:0;
+				top:10em;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		
+		<!--  
+		<canvas id="canvas_2d">
+		
+		</canvas>
+		-->
+	
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
+			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+		</div>
+
+		<script src="/lib/three/three.js"></script>
+		<script src="/lib/three/TrackballControls.js"></script>
+		<script src="/lib/three/Detector.js"></script>
+		<script src="/lib/three/stats.min.js"></script>
+
+		<script src="/js/core/bezier.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var cross;
+
+			var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(-5,-5, 0),
+													BEZIER.core.dim3(-5, 5, 0),
+													BEZIER.core.dim3(5,  5, 0),
+													BEZIER.core.dim3(5, -5, 0)] )
+			var radius = 0.25;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 15;
+
+				controls = new THREE.TrackballControls( camera );
+
+				controls.rotateSpeed = 3.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.keys = [ 65, 83, 68 ];
+
+				controls.addEventListener( 'change', render );
+
+				// world
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+
+				//render curve:
+				//control polygon
+				var control_point_material =  new THREE.MeshLambertMaterial( { color: 0x0000ff, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
+				var control_polygon_material =  new THREE.MeshLambertMaterial( { color: 0x00ff00, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
+				var curve_material =  new THREE.MeshLambertMaterial( { color: 0xff0000, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading } )
+				
+				
+				var line, pt1, pt2;
+				var line1Geometry, line1Mesh;
+				var curve_path = new THREE.CurvePath();
+				var cpt;
+				
+				for(var i = 0; i < curve.num_points()-1; i++){
+					pt1 = curve.get_point(i);
+					pt2 = curve.get_point(i+1);
+				
+					line = new THREE.LineCurve3( new THREE.Vector3(pt1.x, pt1.y, pt1.z),
+				   							 	 new THREE.Vector3(pt2.x, pt2.y, pt2.z) );
+				   	lineGeometry = new THREE.TubeGeometry(line, 64, radius, 8, false)
+					lineMesh = new THREE.Mesh(lineGeometry, control_polygon_material);
+					//scene.add(lineMesh);
+					
+					curve_path.add(line);
+				}
+				
+				
+				var curve_path_mesh = new THREE.Mesh(new THREE.TubeGeometry(curve_path, 64, radius, 8, false), 
+													 control_polygon_material);
+				scene.add(curve_path_mesh);
+
+
+
+				//curve path
+				var points = [];
+				var pt;
+				for (var t = 0; t <=1; t += 0.01){
+					pt = curve.calculate(t);
+					points.push( new THREE.Vector3(pt.x, pt.y, pt.z) )
+				}
+				var spline = new THREE.SplineCurve3(points);
+				var splineGeometry = new THREE.TubeGeometry(spline, 64, radius, 8, false);
+				var splineMesh = new THREE.Mesh(splineGeometry, curve_material);
+				scene.add(splineMesh);
+				console.log(splineMesh);
+
+
+				//control points
+				var control_points = new THREE.Object3D();
+	
+				var control_point_geom = new THREE.SphereGeometry(radius * 1.5, 16, 16);
+				var cp, cp_mesh;
+				for (var i = 0; i < curve.num_points(); i++) {
+					cp = curve.get_point(i);
+					cp_mesh = new THREE.Mesh(control_point_geom, control_point_material);
+					cp_mesh.position.x = cp.x;
+					cp_mesh.position.y = cp.y;
+					cp_mesh.position.z = cp.z;
+					control_points.add(cp_mesh);
+				}
+				scene.add(control_points);
+				// lights
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( -1, -1, -1 );
+				scene.add( light );
+
+				light = new THREE.AmbientLight( 0xffffff );
+				scene.add( light );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+	
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				stats.update();
+
+				//var ctx = document.getElementById("canvas_2d").getContext("2d");
+				//ctx.fillRect(50, 25, 150, 100);
+
+			}
+
+
+		</script>
+
+
+
+	</body>
+</html>
