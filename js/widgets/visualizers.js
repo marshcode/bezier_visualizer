@@ -11,7 +11,8 @@ BEZIER.widgets = BEZIER.widgets  || {};
 ///////////////////////
 
 BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factory, curve_factory) {
-	
+	//FIXME: constructor is getting a little long.  Consider adding some setters and making some sensible defaults
+	//it is also getting tougher to understand the constructor since a lot of the arguments are simple integers
 	num_points = num_points || 100;
 	stage_factory = stage_factory || BEZIER.widgets.stage_basic;
 	curve_factory = curve_factory || BEZIER.widgets.render_solid_tube;
@@ -62,11 +63,7 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 			
 			curve_names.forEach( function(curve_name){
 				var mesh = curves[curve_name];
-				
-				meshes.control_points  = control_points;
-				meshes.control_polygon = control_polygon;
-				meshes.curve           = curve_mesh;
-				
+								
 				scene.add(mesh.control_points);
 				scene.add(mesh.control_polygon);
 				scene.add(mesh.curve);

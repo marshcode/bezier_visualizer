@@ -95,7 +95,7 @@ test("set_curve with instrumented renderer", function () {
 	var curve_info = i_r.stack[0];
 	ok(curve_one === curve_info[0], "proper curve object passed in.");
 	equal(typeof curve_info[1], "number", "radius is a number");
-	equal(curve_info[2], viz3.get_num_points(), "number of rendered points set equal to visualizer points.")
+	equal(curve_info[2], viz3.get_num_points(), "number of rendered points set equal to visualizer points.");
 	
 });
 
@@ -180,8 +180,27 @@ test("get_dom_element_given_height", function () {
 });
 
 test("test_render", function () {
-	ok(false, "failed so I will write the test.")
+	expect(2);
+	function stage_test(width, height) {
+		
+		var stage = BEZIER.widgets.stage_basic(width, height);
+		var num_children = stage.make_scene().children.length;
+		
+		var renderer = {render: function (scene, camera) {
+			ok(camera === stage.camera, "assering that the camera object given is the stage camera.");
+			//each curve creates three meshes: curve, points and control polygon.
+			ok(scene.children.length - num_children, 3, "make sure that we are adding the three meshes required.")
+			
+		}};
+		stage.renderer = renderer;
+		return stage;
+	}
 	
+	//test relies on current default factory method.  This could be re_tooled if it becomes a problem.
+	var viz3 = BEZIER.widgets.visualizer_3d(100, 200, 300, stage_test, null);
+	var curve_one = create_curve(); 
+	viz3.set_curve("curve_one", curve_one);
+	viz3.render();
 });
 
 module("Widgets - visualizer_3d - rendering strategies");
