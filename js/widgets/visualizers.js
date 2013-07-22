@@ -20,8 +20,9 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 	
 	var curves = {};
 	var stage = stage_factory(width || 500, height || 500);
+	var scene = stage.make_scene();
 	
-	return {
+	var that = {
 		/////////POINTS//////////
 		get_num_points: function () {
 			return num_points;
@@ -47,10 +48,25 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 		},
 		
 		set_curve: function (name, curve) {
-			var radius = 0.25; //FIXME: hard coded for beta-1.  
-			curves[name] = curve_factory(curve, radius, this.get_num_points());
+			var radius = 0.25; //FIXME: hard coded for beta-1.
+			var mesh = curve_factory(curve, radius, this.get_num_points());
+			
+			curves[name] = mesh;
+			scene.add(mesh.control_points);
+			scene.add(mesh.control_polygon);
+			scene.add(mesh.curve);
+			
+			
 		},
 		clear_curve: function (name) {
+			var mesh = curves[name];
+			if(mesh){
+				scene.remove(mesh.control_points);
+				scene.remove(mesh.control_polygon);
+				scene.remove(mesh.curve);	
+			}
+
+			
 			delete curves[name];
 		},
 		////////RENDERING////////////
@@ -58,22 +74,22 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 			return stage.renderer.domElement;
 		},
 		render: function () {
-			var scene = stage.make_scene();
-			var curve_names = this.get_curve_names();
-			
-			curve_names.forEach( function(curve_name){
-				var mesh = curves[curve_name];
-								
-				scene.add(mesh.control_points);
-				scene.add(mesh.control_polygon);
-				scene.add(mesh.curve);
-			});			
-			
 			stage.renderer.render(scene, stage.camera);
-		}
+			
+		},
+		
+		update: function () {
+			stage.camera_controls.update();
+		},
 		
 	};
 	
+
+	stage.camera_controls.addEventListener('change', function () {
+		that.render(); 
+	} 
+	);
+	return that;
 };
 
 ////////////////////
@@ -84,7 +100,7 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 	assert(radius > 0, "radius must be greater than 0.");
 	assert(num_points > 0, "num_points must be greater than 0.");
 	
-	var control_point_material =  new THREE.MeshLambertMaterial({color: 0x0000ff, shading: THREE.SmoothShading});
+	var control_point_material =  new THREE.MeshLambertMaterial({ color: 0x0000ff, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading });
 	var control_polygon_material =  new THREE.MeshLambertMaterial({color: 0x00ff00, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading});
 	var curve_material =  new THREE.MeshLambertMaterial({ color: 0xff0000, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading });
 
@@ -140,13 +156,22 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 /////////////////////////
 //STAGE STRATEGIES
 /////////////////////////
-BEZIER.widgets.stage_basic = function (width, height) {
+BEZIER.widgets.stage_basic = function (width, height) {	
 	var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
 	var controls = new THREE.TrackballControls(camera);
 	var clear_color = 0xcccccc;
 	
+	camera.position.z = 14.99;
+	
+	controls.rotateSpeed = 3.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	
 	controls.noZoom = false;
 	controls.noPan = false;
+	
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
 	
 	function make_scene() {
 		var scene = new THREE.Scene();
@@ -174,7 +199,7 @@ BEZIER.widgets.stage_basic = function (width, height) {
 	// renderer
 
 	var renderer = new THREE.WebGLRenderer({antialias: false});
-	renderer.setClearColor(clear_color, 1);
+	renderer.setClearColor(new THREE.Color(clear_color), 1);
 	renderer.setSize(width, height);
 	
 	return {

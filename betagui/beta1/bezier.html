@@ -78,7 +78,8 @@
 			var radius = 0.25;
 
 			init();
-			animate();
+			//animate();
+			render()
 
 			function init() {
 
@@ -203,7 +204,7 @@
 			}
 
 			function onWindowResize() {
-
+				return;
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 

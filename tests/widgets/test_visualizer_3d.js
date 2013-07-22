@@ -189,7 +189,7 @@ test("test_render", function () {
 		var renderer = {render: function (scene, camera) {
 			ok(camera === stage.camera, "assering that the camera object given is the stage camera.");
 			//each curve creates three meshes: curve, points and control polygon.
-			ok(scene.children.length - num_children, 3, "make sure that we are adding the three meshes required.")
+			equal(scene.children.length - num_children, 3, "make sure that we are adding the three meshes required.");
 			
 		}};
 		stage.renderer = renderer;

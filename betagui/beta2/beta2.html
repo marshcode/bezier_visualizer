@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - trackball controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#000;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: red;
+			}
+			
+			canvas{
+				border:solid thin black;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		
+
+	
+		<div id="container"></div>
+		
+		<input type="button" value="toggle" onclick="toggle_curve()" />
+
+
+		<script src="/lib/three/three.js"></script>
+		<script src="/lib/three/TrackballControls.js"></script>
+		<script src="/lib/three/Detector.js"></script>
+		<script src="/lib/three/stats.min.js"></script>
+
+		<script src="/js/core/bezier.js"></script>
+		<script src="/js/widgets/visualizers.js"></script>
+
+		<script type="text/javascript">
+		
+			var viz3D = BEZIER.widgets.visualizer_3d(100, 500, 500);
+			var curve_name = "curve_one"
+			var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(-5,-5, 0),
+										BEZIER.core.dim3(-5, 5, 0),
+										BEZIER.core.dim3(5,  5, 0),
+										BEZIER.core.dim3(5, -5, 0)] )
+			
+			
+			
+		
+			init();
+			animate();
+		
+			function init(){
+				var container = document.getElementById('container');
+				container.appendChild(viz3D.get_dom_element())
+				toggle_curve();
+			}
+		
+			function animate() {
+				requestAnimationFrame( animate );
+				viz3D.update();
+			}
+			
+			function toggle_curve(){
+				console.log("here")
+				if(viz3D.has_curve(curve_name)){
+					viz3D.clear_curve(curve_name)
+				}else{
+					viz3D.set_curve(curve_name, curve);
+				}
+			
+			}
+		
+		</script>
+
+
+
+	</body>
+</html>
