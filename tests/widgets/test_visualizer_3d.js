@@ -335,6 +335,7 @@ test("stage_basic - no params", function () {
 	ok(stage.renderer);
 	equal(stage.renderer.domElement.width, 100);
 	equal(stage.renderer.domElement.height, 200);
+	ok(stage.renderer.domElement === stage.camera_controls.domElement);
 	
 });
 
