@@ -1,6 +1,8 @@
 /*global THREE */ 
 /*global assert */
 
+
+
 var BEZIER = BEZIER || {};
 BEZIER.widgets = BEZIER.widgets  || {};
 
@@ -13,13 +15,15 @@ BEZIER.widgets = BEZIER.widgets  || {};
 BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factory, curve_factory) {
 	//FIXME: constructor is getting a little long.  Consider adding some setters and making some sensible defaults
 	//it is also getting tougher to understand the constructor since a lot of the arguments are simple integers
+	
 	num_points = num_points || 100;
 	stage_factory = stage_factory || BEZIER.widgets.stage_basic;
 	curve_factory = curve_factory || BEZIER.widgets.render_solid_tube;
 	
 	
 	var curves = {};
-	var stage = stage_factory(width || 500, height || 500);
+
+	var stage = stage_factory(width || 500, height || 500);	
 	var scene = stage.make_scene();
 	
 	var that = {
@@ -60,7 +64,7 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 		},
 		clear_curve: function (name) {
 			var mesh = curves[name];
-			if(mesh){
+			if (mesh) {
 				scene.remove(mesh.control_points);
 				scene.remove(mesh.control_polygon);
 				scene.remove(mesh.curve);	
@@ -80,7 +84,7 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 		
 		update: function () {
 			stage.camera_controls.update();
-		},
+		}
 		
 	};
 	
@@ -90,6 +94,7 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 	} 
 	);
 	return that;
+
 };
 
 ////////////////////
@@ -156,23 +161,30 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 /////////////////////////
 //STAGE STRATEGIES
 /////////////////////////
+
 BEZIER.widgets.stage_basic = function (width, height) {	
-	var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
-	var controls = new THREE.TrackballControls(camera);
 	var clear_color = 0xcccccc;
 	
-	camera.position.z = 14.99;
+	//RENDERER
+	var renderer = new THREE.WebGLRenderer({antialias: false});
+	renderer.setClearColor(new THREE.Color(clear_color), 1);
+	renderer.setSize(width, height);
 	
-	controls.rotateSpeed = 3.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
+	//CAMERA AND CONTROLS
+	var camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
+	var camera_controls = new THREE.TrackballControls(camera, renderer.domElement);
+
+	camera.position.z = 1;
 	
-	controls.noZoom = false;
-	controls.noPan = false;
+	camera_controls.rotateSpeed = 3.0;
+	camera_controls.zoomSpeed = 1.2;
+	camera_controls.panSpeed = 0.8;
 	
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
+	camera_controls.noZoom = false;
+	camera_controls.noPan = false;
 	
+
+	//SCENE
 	function make_scene() {
 		var scene = new THREE.Scene();
 		scene.fog = new THREE.FogExp2(clear_color, 0.002);
@@ -191,23 +203,14 @@ BEZIER.widgets.stage_basic = function (width, height) {
 		return scene;
 		
 	}
-
-
-
-
-
-	// renderer
-
-	var renderer = new THREE.WebGLRenderer({antialias: false});
-	renderer.setClearColor(new THREE.Color(clear_color), 1);
-	renderer.setSize(width, height);
 	
 	return {
 		camera:          camera,
-		camera_controls: controls,
+		camera_controls: camera_controls,
 		make_scene:           make_scene,
 		renderer:        renderer
 
 	};
-	
+
 };
+

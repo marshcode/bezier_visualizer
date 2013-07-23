@@ -4,6 +4,7 @@
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+				
 		<style>
 			body {
 				color: #000;
@@ -40,22 +41,22 @@
 		
 
 	
-		<div id="container"></div>
-		
-		<input type="button" value="toggle" onclick="toggle_curve()" />
-
+		<div id="viz_container" style="float:left;padding-left:3em;"></div>
+		<div id="dat_container" style="float:left;padding-left:3em;"></div>
 
 		<script src="/lib/three/three.js"></script>
 		<script src="/lib/three/TrackballControls.js"></script>
 		<script src="/lib/three/Detector.js"></script>
 		<script src="/lib/three/stats.min.js"></script>
 
-		<script src="/js/core/bezier.js"></script>
+		<script src="/lib/dat/dat.gui.js"></script>
+		  
+		<script src="/js/core/bezier.js"></script>		
 		<script src="/js/widgets/visualizers.js"></script>
 
 		<script type="text/javascript">
 		
-			var viz3D = BEZIER.widgets.visualizer_3d(100, 500, 500);
+			var viz3D;
 			var curve_name = "curve_one"
 			var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(-5,-5, 0),
 										BEZIER.core.dim3(-5, 5, 0),
@@ -65,26 +66,50 @@
 			
 			
 		
-			init();
+			init_viz();
+			init_dat();
 			animate();
 		
-			function init(){
-				var container = document.getElementById('container');
+			function init_viz(){
+				viz3D = BEZIER.widgets.visualizer_3d(100, 500, 500);
+				var container = document.getElementById('viz_container');
 				container.appendChild(viz3D.get_dom_element())
-				toggle_curve();
+				viz3D.set_curve(curve_name, curve);
 			}
+		
+			//////////////////
+			//GUI and controllers
+			//////////////////
+			function init_dat(){
+				controller = {};
+				controller.clear_curve = function (){
+									console.log("clearing curve");		
+								 }
+				controller.whatever = "";				
+
+
+				var gui = new dat.GUI({ autoPlace: false });
+				gui.add(controller, 'clear_curve').name("Clear Curve");
+				gui.add(controller, 'whatever', [ 'pizza', 'chrome', 'hooray' ] );
+				
+				var dat_container = document.getElementById('dat_container');
+				dat_container.appendChild(gui.domElement);
+			
+			}			
+			
+			////////////////////////
+			//Visualizers
+			////////////////////////
 		
 			function animate() {
 				requestAnimationFrame( animate );
 				viz3D.update();
 			}
 			
-			function toggle_curve(){
-				console.log("here")
+			function clear_curve(curve_name){
+
 				if(viz3D.has_curve(curve_name)){
 					viz3D.clear_curve(curve_name)
-				}else{
-					viz3D.set_curve(curve_name, curve);
 				}
 			
 			}
