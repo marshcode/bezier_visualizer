@@ -55,7 +55,9 @@
 		<script src="/js/widgets/visualizers.js"></script>
 
 		<script type="text/javascript">
-		
+			////////////////////////
+			//INITIALIZATION
+			////////////////////////
 			var viz3D;
 			var curve_name = "curve_one"
 			var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(-5,-5, 0),
@@ -67,11 +69,11 @@
 			
 		
 			init_viz();
-			init_dat();
+			init_dat([ 'pizza', 'chrome', 'hooray' ]);
 			animate();
 		
 			function init_viz(){
-				viz3D = BEZIER.widgets.visualizer_3d(100, 500, 500);
+				viz3D = BEZIER.widgets.visualizer_3d(100, 800, 800);
 				var container = document.getElementById('viz_container');
 				container.appendChild(viz3D.get_dom_element())
 				viz3D.set_curve(curve_name, curve);
@@ -80,20 +82,29 @@
 			//////////////////
 			//GUI and controllers
 			//////////////////
-			function init_dat(){
+			function init_dat(item_list){
 				controller = {};
 				controller.clear_curve = function (){
 									console.log("clearing curve");		
 								 }
 				controller.whatever = "";				
 
-
+				var dat_container = document.getElementById('dat_container');
 				var gui = new dat.GUI({ autoPlace: false });
 				gui.add(controller, 'clear_curve').name("Clear Curve");
-				gui.add(controller, 'whatever', [ 'pizza', 'chrome', 'hooray' ] );
+				var curve_controller = gui.add(controller, 'whatever', item_list );
 				
-				var dat_container = document.getElementById('dat_container');
+				
+				
+				curve_controller.onChange( function(e){
+					gui.destroy();
+					dat_container.removeChild(gui.domElement);
+					init_dat(["1", "2", "3"]);
+				});
+				
+				
 				dat_container.appendChild(gui.domElement);
+
 			
 			}			
 			

@@ -16,11 +16,13 @@ function create_curve() {
 }
 
 function instrumented_renderer() {
+	
+	
 	return {
 		stack: [],
 		instrument: function (curve, radius, num_points) {
 			this.stack.push([curve, radius, num_points]);
-			return {};//not returning anything useful here.  Might come back to bite us?
+			return {"control_ponts":null, "control_polygon":null, "curve":null};//not returning anything useful here.  Might come back to bite us?
 		}
 	};
 }
@@ -32,7 +34,8 @@ test("Empty Constructor", function () {
 
 test("Constructor", function () {
 	
-	var viz3 = BEZIER.widgets.visualizer_3d(50);
+	var viz3 = BEZIER.widgets.visualizer_3d();
+	viz3.set_num_points(50);
 	equal(viz3.get_num_points(), 50, "Assert get_point equals constructor");
 });
 
@@ -62,8 +65,13 @@ test("set_curve with i/r and num_point change", function () {
 	var num_points_1 = 300;
 	var num_points_2 = 400;
 	
+	function instrument(curve, radius, num_points) {
+		return i_r.instrument(curve, radius, num_points);
+	}
 	
-	var viz3 = BEZIER.widgets.visualizer_3d(num_points_1, null, null, null, i_r.instrument.bind(i_r));
+	var viz3 = BEZIER.widgets.visualizer_3d(500, 500);
+	viz3.set_num_points(num_points_1);
+	viz3.set_curve_factory(instrument);
 	var curve_one = create_curve();
 	
 	equal(i_r.stack.length, 0, "i_r stack has no calls on it.");
@@ -83,8 +91,13 @@ test("set_curve with instrumented renderer", function () {
 	
 
 	var i_r = instrumented_renderer();
-	 
-	var viz3 = BEZIER.widgets.visualizer_3d(null, null, null, null, i_r.instrument.bind(i_r));
+	function instrument(curve, radius, num_points) {
+		return i_r.instrument(curve, radius, num_points);
+	} 
+	
+	
+	var viz3 = BEZIER.widgets.visualizer_3d();
+	viz3.set_curve_factory(instrument);
 	var curve_one = create_curve();
 	
 	equal(i_r.stack.length, 0, "instrumented renderer is empty");
@@ -163,7 +176,7 @@ test("get_set_override_clear_curve_names", function () {
 
 test("get_dom_element_default_height", function () {
 	var viz3 = BEZIER.widgets.visualizer_3d();
-	var elm = viz3.get_dom_element()
+	var elm = viz3.get_dom_element();
 	equal(elm.tagName.toLowerCase(), "canvas");
 	equal(elm.width, 500);
 	equal(elm.height, 500);
@@ -171,15 +184,15 @@ test("get_dom_element_default_height", function () {
 });
 
 test("get_dom_element_given_height", function () {
-	var viz3 = BEZIER.widgets.visualizer_3d(100, 200, 300);
-	var elm = viz3.get_dom_element()
+	var viz3 = BEZIER.widgets.visualizer_3d(200, 300);
+	var elm = viz3.get_dom_element();
 	equal(elm.tagName.toLowerCase(), "canvas");
 	equal(elm.width, 200);
 	equal(elm.height, 300);
 	
 });
 
-test("test_render", function () {
+test("Widgets - visualizer_3d - update force render", function () {
 	expect(2);
 	function stage_test(width, height) {
 		
@@ -189,18 +202,18 @@ test("test_render", function () {
 		var renderer = {render: function (scene, camera) {
 			ok(camera === stage.camera, "assering that the camera object given is the stage camera.");
 			//each curve creates three meshes: curve, points and control polygon.
-			equal(scene.children.length - num_children, 3, "make sure that we are adding the three meshes required.");
+			ok(scene.children.length - num_children > 0, "make sure that we added something beyond.");
 			
 		}};
 		stage.renderer = renderer;
 		return stage;
 	}
 	
-	//test relies on current default factory method.  This could be re_tooled if it becomes a problem.
-	var viz3 = BEZIER.widgets.visualizer_3d(100, 200, 300, stage_test, null);
+	var viz3 = BEZIER.widgets.visualizer_3d(200, 300, stage_test);
 	var curve_one = create_curve(); 
 	viz3.set_curve("curve_one", curve_one);
-	viz3.render();
+	viz3.update();
+	
 });
 
 module("Widgets - visualizer_3d - rendering strategies");

@@ -12,19 +12,25 @@ BEZIER.widgets = BEZIER.widgets  || {};
 //main interface to THREE.js
 ///////////////////////
 
-BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factory, curve_factory) {
+BEZIER.widgets.visualizer_3d = function (width, height, stage_factory) {
 	//FIXME: constructor is getting a little long.  Consider adding some setters and making some sensible defaults
 	//it is also getting tougher to understand the constructor since a lot of the arguments are simple integers
 	
-	num_points = num_points || 100;
+	var num_points = 100;
 	stage_factory = stage_factory || BEZIER.widgets.stage_basic;
-	curve_factory = curve_factory || BEZIER.widgets.render_solid_tube;
+	var curve_factory = BEZIER.widgets.render_solid_tube;
 	
 	
 	var curves = {};
 
 	var stage = stage_factory(width || 500, height || 500);	
 	var scene = stage.make_scene();
+	
+	var render_trigger = false;
+	function render() {
+		stage.renderer.render(scene, stage.camera);
+		render_trigger = true;
+	}
 	
 	var that = {
 		/////////POINTS//////////
@@ -74,25 +80,28 @@ BEZIER.widgets.visualizer_3d = function (num_points, width, height, stage_factor
 			delete curves[name];
 		},
 		////////RENDERING////////////
+		
+		set_curve_factory: function (_curve_factory) {
+			curve_factory  = _curve_factory || curve_factory;
+		},
+		
 		get_dom_element: function () {
 			return stage.renderer.domElement;
 		},
-		render: function () {
-			stage.renderer.render(scene, stage.camera);
-			
-		},
 		
 		update: function () {
+			render_trigger = false;
 			stage.camera_controls.update();
+			
+			if (!render_trigger) {
+				render();
+			}
 		}
 		
 	};
 	
 
-	stage.camera_controls.addEventListener('change', function () {
-		that.render(); 
-	} 
-	);
+	stage.camera_controls.addEventListener('change', render);
 	return that;
 
 };
