@@ -3,18 +3,12 @@ BEZIER.parsers = BEZIER.parsers  || {};
 
 
 BEZIER.parsers.single = function (data) {
-	data = data.trim();
+	
 	var points = [];
 	
-	data.split('\n').forEach(function (line) {
-		line = line.trim();
-		if (line[0] === "#" || line.length === 0) { //allow comments and blank lines
-			return;
-		}
-		line = line.split("#")[0]; //allow inline comments
-		line = line.split(",");
-		
-		points.push(BEZIER.core.dim3(Number(line[0]), Number(line[1]), Number(line[2])));
+	
+	JSON.parse(data).forEach(function (point) {
+		points.push(BEZIER.core.dim3(Number(point[0]), Number(point[1]), Number(point[2])));
 		
 	});
 	

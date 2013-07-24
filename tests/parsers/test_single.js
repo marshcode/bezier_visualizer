@@ -29,25 +29,18 @@ function do_simple_parse_test(data, expected_data){
 
 var test_vector = [
 	["parse simple curve",
-	 "1,2,3\n" +
-	 "4,5,6\n" +
-	 "7,8,9\n", [[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+	 "[[1,2,3],\n" +
+	 "[4,5,6],\n" +
+	 "[7,8,9]]\n", [[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
 	 
 	["parse small simple curve",
-	 "1,2,3\n" +
-	 "4,5,6\n", [[1, 2, 3], [4, 5, 6]]],
+	 "[[1,2,3],\n" +
+	 "[4,5,6]]\n", [[1, 2, 3], [4, 5, 6]]],
 
 	["parse curve with spaces",
-	 "1,2,3\n" +
+	 "[[1,2,3],\n" +
 	 "\n" +
-	 "4,5,6\n", [[1, 2, 3], [4, 5, 6]]],
-	 
-	["parse simple curve with comments",
-	 "#a comment\n" +
-	 "1,2,3\n" +
-	 "4,5,6 #internal comment\n" +
-	 "7,8,9\n" +
-	 "#another comment\n", [[1, 2, 3], [4, 5, 6], [7, 8, 9]]]        
+	 "[4,5,6]]\n", [[1, 2, 3], [4, 5, 6]]],     
 ];
 
 test_vector.forEach(function (vector) {
