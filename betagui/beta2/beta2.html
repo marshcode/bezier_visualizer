@@ -73,7 +73,7 @@
 											load_curve(curve_list[key]); //not sure if this will hold up.  Does dat sort the keys before adding them?
 										  }
 			]);
-		
+				
 			function init_viz(){
 				viz3D = BEZIER.widgets.visualizer_3d(800, 800);
 				var container = $('#viz_container');
@@ -87,11 +87,13 @@
 			function init_dat(item_list){
 				controller = {};
 				controller.clear_curve = function (){
-									console.log("clearing curve");		
+									clear_curve("curve");		
 								 }
 				controller.refresh_curve = function (){
-									console.log("clearing curve");		
-								 }
+					gui.destroy();
+					$(gui.domElement).remove();
+					load_curves(curve_list_url, [init_dat]);
+				}
 
 				controller.curve_list = "";				
 
@@ -102,12 +104,6 @@
 				var refresh_curve = gui.add(controller, 'refresh_curve').name("Refresh Curve List");
 				var curve_list = gui.add(controller, 'curve_list', item_list ).name("Curve List");
 				gui.add(controller, 'clear_curve').name("Clear Curve");
-				
-				refresh_curve.onChange( function (){
-					gui.destroy();
-					$(gui.domElement).remove();
-					load_curves(curve_list_url);
-				});
 				
 				curve_list.onChange( function(e){
 					load_curve(controller.curve_list)
