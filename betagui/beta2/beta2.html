@@ -66,15 +66,20 @@
 			
 		
 			init_viz();
-			//init_dat();
 			animate();
-			load_curves();
+			load_curves(curve_list_url, [init_dat, 
+										 function(curve_list){
+											var key = Object.keys(curve_list)[0]
+											load_curve(curve_list[key]); //not sure if this will hold up.  Does dat sort the keys before adding them?
+										  }
+			]);
 		
 			function init_viz(){
 				viz3D = BEZIER.widgets.visualizer_3d(800, 800);
 				var container = $('#viz_container');
 				container.append(viz3D.get_dom_element())
 			}
+
 		
 			//////////////////
 			//GUI and controllers
@@ -125,10 +130,13 @@
 			}
 			
 			
-			function load_curves(){
-				$.ajax({url: curve_list_url}).done(function ( data ) {
+			function load_curves(url, callbacks){
+				$.ajax({url: url}).done(function ( data ) {
 					curve_list = jQuery.parseJSON(data);
-					init_dat(curve_list);
+					
+					callbacks.forEach(function (f) {
+						f(curve_list);
+					});
 				  });
 			
 			}
