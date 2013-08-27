@@ -59,13 +59,15 @@ test("get_set_override_clear_curve", function () {
 	var curve_one = create_curve_storage(); 
 	var curve_one_prime = create_curve_storage(); 
 	
-	expect(5);
+	expect(7);
 	
 	ok(curve_one !== curve_one_prime, "pre-test, two curves do not equal each other.");
 	curve_storage.set_curve("curve_one", curve_one);
 	ok(curve_storage.has_curve("curve_one"), "make sure it returns the exact same curve object");
+	ok(curve_storage.get_curve("curve_one") === curve_one);
 	curve_storage.set_curve("curve_one", curve_one_prime);
 	ok(curve_storage.has_curve("curve_one"), "make sure it returns the new curve object");
+	ok(curve_storage.get_curve("curve_one") === curve_one_prime);
 	
 	curve_storage.once("cleared", function (curve_name){
 		ok(curve_name === "curve_one");

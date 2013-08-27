@@ -52,8 +52,11 @@
 		<script src="/lib/dat/dat.gui.js"></script>
 		  
 		<script src="/lib/jquery/jquery.js"></script>
+		<script src="/lib/underscore/underscore-min.js"></script>
+		<script src="/lib/backbone/backbone-min.js"></script>
 		  
-		<script src="/js/core/bezier.js"></script>		
+		<script src="/js/core/bezier.js"></script>	
+		<script src="/js/core/storage.js"></script>	
 		<script src="/js/widgets/visualizers.js"></script>
 		<script src="/js/parsers/single.js"></script>
 
@@ -62,6 +65,7 @@
 			//INITIALIZATION
 			////////////////////////
 			var viz3D;
+			var storage;
 			var curve_list_url = "curves/curve.list"			
 			
 		
@@ -75,7 +79,8 @@
 			]);
 				
 			function init_viz(){
-				viz3D = BEZIER.widgets.visualizer_3d(800, 800);
+				storage = BEZIER.storage.curve_storage();
+				viz3D = BEZIER.widgets.visualizer_3d(storage, 800, 800);
 				var container = $('#viz_container');
 				container.append(viz3D.get_dom_element())
 			}
@@ -120,8 +125,8 @@
 			function load_curve(url){
 				$.ajax({url: url}).done(function ( data ) {
 					var curve = BEZIER.parsers.single(data);
-					viz3D.clear_curve("curve");
-					viz3D.set_curve("curve", curve);
+					storage.clear_curve("curve");
+					storage.set_curve("curve", curve);
 				  });
 			}
 			
@@ -148,8 +153,8 @@
 			
 			function clear_curve(curve_name){
 
-				if(viz3D.has_curve(curve_name)){
-					viz3D.clear_curve(curve_name)
+				if(storage.has_curve(curve_name)){
+					storage.clear_curve(curve_name)
 				}
 			
 			}

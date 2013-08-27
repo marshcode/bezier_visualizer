@@ -12,9 +12,13 @@ BEZIER.widgets = BEZIER.widgets  || {};
 //main interface to THREE.js
 ///////////////////////
 
-BEZIER.widgets.visualizer_3d = function (width, height, stage_factory) {
+BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_factory) {
 	//FIXME: constructor is getting a little long.  Consider adding some setters and making some sensible defaults
 	//it is also getting tougher to understand the constructor since a lot of the arguments are simple integers
+	
+	if(!curve_storage){
+		throw BEZIER.errors.illegal_argument_error("curve_storage cannot be null");
+	}
 	
 	var num_points = 100;
 	stage_factory = stage_factory || BEZIER.widgets.stage_basic;
@@ -31,7 +35,7 @@ BEZIER.widgets.visualizer_3d = function (width, height, stage_factory) {
 		stage.renderer.render(scene, stage.camera);
 		render_trigger = true;
 	}
-	
+		
 	var that = {
 		/////////POINTS//////////
 		get_num_points: function () {
@@ -42,43 +46,6 @@ BEZIER.widgets.visualizer_3d = function (width, height, stage_factory) {
 			num_points = num;
 		},
 	
-		/////////CURVES/////////
-		get_curve_names: function (name) {
-			var l = [];
-			for (var key in curves) {
-			    if (curves.hasOwnProperty(key)) {
-			        l.push(key);
-			    }
-			}
-			return l;
-		},
-		
-		has_curve: function (name) {
-			return name in curves;
-		},
-		
-		set_curve: function (name, curve) {
-			var radius = 0.25; //FIXME: hard coded for beta-1.
-			var mesh = curve_factory(curve, radius, this.get_num_points());
-			
-			curves[name] = mesh;
-			scene.add(mesh.control_points);
-			scene.add(mesh.control_polygon);
-			scene.add(mesh.curve);
-			
-			
-		},
-		clear_curve: function (name) {
-			var mesh = curves[name];
-			if (mesh) {
-				scene.remove(mesh.control_points);
-				scene.remove(mesh.control_polygon);
-				scene.remove(mesh.curve);	
-			}
-
-			
-			delete curves[name];
-		},
 		////////RENDERING////////////
 		
 		set_curve_factory: function (_curve_factory) {
@@ -100,7 +67,32 @@ BEZIER.widgets.visualizer_3d = function (width, height, stage_factory) {
 		
 	};
 	
+	curve_storage.on("changed", function (curve_name){
+		
+		var radius = 0.25; //FIXME: hard coded for beta-1.
+		var curve = curve_storage.get_curve(curve_name);
+		var mesh = curve_factory(curve, radius, that.get_num_points());
+		
+		curves[curve_name] = mesh;
+		scene.add(mesh.control_points);
+		scene.add(mesh.control_polygon);
+		scene.add(mesh.curve);
+		
+	});
+	
+	curve_storage.on("cleared", function (curve_name){
+		
+		var mesh = curves[curve_name];
+		if (mesh) {
+			scene.remove(mesh.control_points);
+			scene.remove(mesh.control_polygon);
+			scene.remove(mesh.curve);	
+		}
 
+		delete curves[curve_name];
+		
+	});
+	
 	stage.camera_controls.addEventListener('change', render);
 	return that;
 

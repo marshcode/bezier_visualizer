@@ -24,6 +24,13 @@ BEZIER.storage.curve_storage = function () {
 			return name in curves;
 		},
 		
+		get_curve: function (name){
+			if(this.has_curve(name)){
+				return curves[name]
+			}
+			return null;
+		},
+		
 		set_curve: function (name, curve) {			
 			curves[name] = curve;
 			this.trigger("changed", name);

@@ -10,9 +10,13 @@
 
 module("Widgets - visualizer_3d");
 
-function create_curve() {
+function create_curve_3d() {
 	//Real curve object.  Now required since the visualizer is trying to render the geometries
 	return BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0, 0, 0), BEZIER.core.dim3(1, 1, 1)]);
+}
+
+function create_curve_storage_3d(){
+	return BEZIER.storage.curve_storage();
 }
 
 function instrumented_renderer() {
@@ -28,20 +32,28 @@ function instrumented_renderer() {
 }
 
 test("Empty Constructor", function () {
-	var viz3 = BEZIER.widgets.visualizer_3d();
-	equal(viz3.get_num_points(), 100, "Assert number of render points is defaulty set to 100.");
+	expect(1);
+	try {
+		var viz3 = BEZIER.widgets.visualizer_3d();
+	} catch (e) {
+		equal(e.name, "IllegalArgumentError", e.message);
+	}
+
+
 });
 
 test("Constructor", function () {
-	
-	var viz3 = BEZIER.widgets.visualizer_3d();
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage);
+	equal(viz3.get_num_points(), 100, "Assert get_point equals constructor");
 	viz3.set_num_points(50);
 	equal(viz3.get_num_points(), 50, "Assert get_point equals constructor");
 });
 
 
 test("get set num points", function () {
-	var viz3 = BEZIER.widgets.visualizer_3d(100);
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 100);
 	viz3.set_num_points(200);
 	equal(viz3.get_num_points(), 200, "Assert that points were set correctly.");
 	
@@ -56,17 +68,17 @@ test("set_curve with i/r and num_point change", function () {
 	function instrument(curve, radius, num_points) {
 		return i_r.instrument(curve, radius, num_points);
 	}
-	
-	var viz3 = BEZIER.widgets.visualizer_3d(500, 500);
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
 	viz3.set_num_points(num_points_1);
 	viz3.set_curve_factory(instrument);
-	var curve_one = create_curve();
+	var curve_one = create_curve_3d();
 	
 	equal(i_r.stack.length, 0, "i_r stack has no calls on it.");
 	
-	viz3.set_curve("curve_one", curve_one);
+	curve_storage.set_curve("curve_one", curve_one);
 	viz3.set_num_points(num_points_2);
-	viz3.set_curve("curve_one", curve_one);
+	curve_storage.set_curve("curve_one", curve_one);
 	
 	equal(i_r.stack.length, 2, "i_r stack has two calls on it.");
 	
@@ -83,14 +95,14 @@ test("set_curve with instrumented renderer", function () {
 		return i_r.instrument(curve, radius, num_points);
 	} 
 	
-	
-	var viz3 = BEZIER.widgets.visualizer_3d();
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage);
 	viz3.set_curve_factory(instrument);
-	var curve_one = create_curve();
+	var curve_one = create_curve_3d();
 	
 	equal(i_r.stack.length, 0, "instrumented renderer is empty");
-	viz3.set_curve("curve_one", curve_one);
-	ok(viz3.has_curve("curve_one"), "curve placed into renderer");
+	curve_storage.set_curve("curve_one", curve_one);
+	ok(curve_storage.has_curve("curve_one"), "curve placed into renderer");
 	equal(i_r.stack.length, 1, "instrumented renderer has one item");
 	
 	var curve_info = i_r.stack[0];
@@ -103,7 +115,9 @@ test("set_curve with instrumented renderer", function () {
 
 
 test("get_dom_element_default_height", function () {
-	var viz3 = BEZIER.widgets.visualizer_3d();
+	
+	var curve_storage = create_curve_storage_3d(curve_storage);
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage);
 	var elm = viz3.get_dom_element();
 	equal(elm.tagName.toLowerCase(), "canvas");
 	equal(elm.width, 500);
@@ -112,7 +126,9 @@ test("get_dom_element_default_height", function () {
 });
 
 test("get_dom_element_given_height", function () {
-	var viz3 = BEZIER.widgets.visualizer_3d(200, 300);
+	
+	var curve_storage = create_curve_storage_3d(curve_storage);
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 200, 300);
 	var elm = viz3.get_dom_element();
 	equal(elm.tagName.toLowerCase(), "canvas");
 	equal(elm.width, 200);
@@ -137,9 +153,10 @@ test("Widgets - visualizer_3d - update force render", function () {
 		return stage;
 	}
 	
-	var viz3 = BEZIER.widgets.visualizer_3d(200, 300, stage_test);
-	var curve_one = create_curve(); 
-	viz3.set_curve("curve_one", curve_one);
+	var curve_storage = create_curve_storage_3d(curve_storage);
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 200, 300, stage_test);
+	var curve_one = create_curve_3d(); 
+	curve_storage.set_curve("curve_one", curve_one);
 	viz3.update();
 	
 });
