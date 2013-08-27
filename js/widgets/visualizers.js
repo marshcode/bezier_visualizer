@@ -67,7 +67,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		
 	};
 	
-	curve_storage.on("changed", function (curve_name){
+	curve_storage.on(curve_storage.UPDATED_EVENT, function (curve_name){
 		
 		var radius = 0.25; //FIXME: hard coded for beta-1.
 		var curve = curve_storage.get_curve(curve_name);
@@ -80,7 +80,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		
 	});
 	
-	curve_storage.on("cleared", function (curve_name){
+	curve_storage.on(curve_storage.CLEARED_EVENT, function (curve_name){
 		
 		var mesh = curves[curve_name];
 		if (mesh) {

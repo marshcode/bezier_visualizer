@@ -5,10 +5,36 @@
 /*global ok */ 
 /*global expect */ 
 
-function create_curve_storage(){
+function create_curve_storage() {
 	return {};
 }
 
+test("updated - no curve", function () {
+	expect(0);
+	var curve_storage = BEZIER.storage.curve_storage();
+	curve_storage.on(curve_storage.UPDATED_EVENT, function () {
+		
+		ok(false, "event should not fire if curve does not exist");
+	});
+	
+	curve_storage.updated("whatever");
+	
+});
+
+test("updated", function () {
+	expect(1);
+	var curve_storage = BEZIER.storage.curve_storage();
+	
+	var curve_one = create_curve_storage(); 
+	curve_storage.set_curve("curve_one", curve_one);
+
+	curve_storage.on(curve_storage.UPDATED_EVENT, function (curve_name) {
+		equal(curve_name, "curve_one");
+	});
+	curve_storage.updated("curve_one");
+	
+	
+});
 
 
 test("has no curve", function () {

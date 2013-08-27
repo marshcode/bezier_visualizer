@@ -10,6 +10,17 @@ BEZIER.storage.curve_storage = function () {
 	var curves = {};
 	
 	var that = {
+		UPDATED_EVENT: "changed",
+		CLEARED_EVENT: "cleared",
+			
+		updated: function (name) {
+			
+			if (!this.has_curve(name)) {
+				return;
+			}
+			this.trigger(this.UPDATED_EVENT, name);
+		},
+		
 		get_curve_names: function (name) {
 			var l = [];
 			for (var key in curves) {
@@ -24,16 +35,16 @@ BEZIER.storage.curve_storage = function () {
 			return name in curves;
 		},
 		
-		get_curve: function (name){
-			if(this.has_curve(name)){
-				return curves[name]
+		get_curve: function (name) {
+			if (this.has_curve(name)) {
+				return curves[name];
 			}
 			return null;
 		},
 		
 		set_curve: function (name, curve) {			
 			curves[name] = curve;
-			this.trigger("changed", name);
+			this.updated(name);
 		},
 		clear_curve: function (name) {
 			var curve = curves[name];
@@ -42,7 +53,7 @@ BEZIER.storage.curve_storage = function () {
 			}
 
 			delete curves[name];
-			this.trigger("cleared", name);
+			this.trigger(this.CLEARED_EVENT, name);
 		}
 	};
 	
