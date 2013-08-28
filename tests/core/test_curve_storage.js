@@ -5,6 +5,8 @@
 /*global ok */ 
 /*global expect */ 
 
+module("BezierCurve - CurveStorage");
+
 function create_curve_storage() {
 	return {};
 }
@@ -12,7 +14,7 @@ function create_curve_storage() {
 test("updated - no curve", function () {
 	expect(0);
 	var curve_storage = BEZIER.storage.curve_storage();
-	curve_storage.on(curve_storage.UPDATED_EVENT, function () {
+	curve_storage.on(curve_storage.EVENT_UPDATED, function () {
 		
 		ok(false, "event should not fire if curve does not exist");
 	});
@@ -21,14 +23,19 @@ test("updated - no curve", function () {
 	
 });
 
-test("updated", function () {
-	expect(1);
+test("updated and added", function () {
+	expect(2);
 	var curve_storage = BEZIER.storage.curve_storage();
+	
+	
+	curve_storage.once(curve_storage.EVENT_ADDED, function (curve_name) {
+		equal(curve_name, "curve_one");
+	});
 	
 	var curve_one = create_curve_storage(); 
 	curve_storage.set_curve("curve_one", curve_one);
 
-	curve_storage.on(curve_storage.UPDATED_EVENT, function (curve_name) {
+	curve_storage.once(curve_storage.EVENT_UPDATED, function (curve_name) {
 		equal(curve_name, "curve_one");
 	});
 	curve_storage.updated("curve_one");
@@ -48,7 +55,7 @@ test("clear no curve", function () {
 	
 	var curve_storage = BEZIER.storage.curve_storage();
 	
-	curve_storage.on("cleared", function(model){
+	curve_storage.on(curve_storage.EVENT_CLEARED, function(model){
 		ok(false, "test failed, this should not be called");
 	});
 	
@@ -64,12 +71,12 @@ test("set_two_curves", function () {
 	expect(4);
 
 	
-	curve_storage.once("changed", function (curve_name) {
+	curve_storage.once(curve_storage.EVENT_ADDED, function (curve_name) {
 		ok(curve_name === "curve_one");
 	});
 	curve_storage.set_curve("curve_one", curve_one);
 	
-	curve_storage.once("changed", function (curve_name) {
+	curve_storage.once(curve_storage.EVENT_ADDED, function (curve_name) {
 		ok(curve_name === "curve_two");
 	});
 	curve_storage.set_curve("curve_two", curve_two);
@@ -95,7 +102,7 @@ test("get_set_override_clear_curve", function () {
 	ok(curve_storage.has_curve("curve_one"), "make sure it returns the new curve object");
 	ok(curve_storage.get_curve("curve_one") === curve_one_prime);
 	
-	curve_storage.once("cleared", function (curve_name){
+	curve_storage.once(curve_storage.EVENT_CLEARED, function (curve_name){
 		ok(curve_name === "curve_one");
 	})
 	

@@ -10,15 +10,16 @@ BEZIER.storage.curve_storage = function () {
 	var curves = {};
 	
 	var that = {
-		UPDATED_EVENT: "changed",
-		CLEARED_EVENT: "cleared",
+		EVENT_ADDED:   "added",
+		EVENT_UPDATED: "changed",
+		EVENT_CLEARED: "cleared",
 			
 		updated: function (name) {
 			
 			if (!this.has_curve(name)) {
 				return;
 			}
-			this.trigger(this.UPDATED_EVENT, name);
+			this.trigger(this.EVENT_UPDATED, name);
 		},
 		
 		get_curve_names: function (name) {
@@ -43,8 +44,15 @@ BEZIER.storage.curve_storage = function () {
 		},
 		
 		set_curve: function (name, curve) {			
+			
+			event = this.EVENT_ADDED;
+			if(this.has_curve(name)){
+				event = this.EVENT_UPDATED;
+			}
+				
+				
 			curves[name] = curve;
-			this.updated(name);
+			this.trigger(event, name);
 		},
 		clear_curve: function (name) {
 			var curve = curves[name];
@@ -53,9 +61,10 @@ BEZIER.storage.curve_storage = function () {
 			}
 
 			delete curves[name];
-			this.trigger(this.CLEARED_EVENT, name);
+			this.trigger(this.EVENT_CLEARED, name);
 		}
 	};
+	
 	
 	_.extend(that, Backbone.Events);
 	return that;
