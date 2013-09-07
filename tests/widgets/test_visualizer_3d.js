@@ -157,7 +157,7 @@ test("Widgets - visualizer_3d - update force render", function () {
 	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 200, 300, stage_test);
 	var curve_one = create_curve_3d(); 
 	curve_storage.set_curve("curve_one", curve_one);
-	viz3.update();
+	//viz3.update(); #render is forced when curves are added
 	
 });
 
