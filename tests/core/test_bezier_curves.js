@@ -5,28 +5,104 @@
 /*global expect */
 /*global fuzzy_equal */ 
 /*global BEZIER */ 
-
+/*global throws */ 
 
 module("BezierCurve - BezierCurve3");
 
-test("Empty Constructor", function () {
-	expect(1);
+test("Test Set Point", function () {
+	
+	
+	function assert_pt(pt, x, y, z) {
+		
+		equal(pt.x, x);
+		equal(pt.y, y);
+		equal(pt.z, z);
+	}
+	
+	var pt1 = BEZIER.core.dim3(0, 0, 0);
+	var bz = BEZIER.core.bezier_curve_3();
+	
+	bz.add_point(pt1);
+	
+	bz.set_point(0, {x: 1});
+	assert_pt(bz.get_point(0), 1, 0, 0);
+
+	bz.set_point(0, {y: 2});
+	assert_pt(bz.get_point(0), 1, 2, 0);
+
+	bz.set_point(0, {z: 3});
+	assert_pt(bz.get_point(0), 1, 2, 3);
+	
+});
+
+test("Test Add Get Set Remove Point", function () {
+	
+	var pt1 = BEZIER.core.dim3(1, 2, 3);
+	var pt2 = BEZIER.core.dim3(4, 5, 6);
+	
+	
+	var bz = BEZIER.core.bezier_curve_3();
+	equal(bz.num_points(), 0, "Make sure the curve starts out empty.");
+	
+	var idx1 = bz.add_point(pt1);
+	equal(bz.num_points(), 1, "We should now have one point.");
+	equal(idx1, 0, "The added point has index 0.");
+	
+	var idx2 = bz.add_point(pt2);
+	equal(bz.num_points(), 2, "Curve now has two points.");
+	equal(idx2, 1, "Second point has index 1.");
+	
+	equal(bz.get_point(idx1), pt1, "make sure the point 1 was stored correctly.");
+	equal(bz.get_point(idx2), pt2, "make sure the point 2 was stored correctly.");
+	
+	bz.set_point(idx1, {x: 7, y: 8, z: 9});
+	pt1 = bz.get_point(idx1);
+	equal(pt1.x, 7, "point 1 x equals 7");
+	equal(pt1.y, 8, "point 1 y equals 8");
+	equal(pt1.z, 9, "point 1 z equals 9");
+	
+	bz.remove_point(idx1);
+	equal(bz.num_points(), 1, "point count has decreased");
+	equal(bz.get_point(idx1), pt2, "after the removal, point two is now it point 1's slot");
+	
+	bz.remove_point(idx1);
+	equal(bz.num_points(), 0, "curve is now empty.");
+});
+
+
+test("Remove Point out of range", function () {
+	var bz = BEZIER.core.bezier_curve_3();
+	bz.add_point(BEZIER.core.dim3(1, 2, 3));
+	expect(2);
+	
+	try {
+		bz.remove_point(-1);
+	} catch (e) {
+		equal(e.name, "IllegalArgumentError", "T is out of range:" + e.message);
+	}
 
 	try {
-		var bz = BEZIER.core.bezier_curve_3();
+		bz.remove_point(2);
 	} catch (e) {
-		equal(e.name, "IllegalArgumentError", "Throws error on empty constructor");	
+		equal(e.name, "IllegalArgumentError", "T is out of range:" + e.message);
 	}
+
+});
+
+test("Empty Constructor", function () {
+
+	var bz = BEZIER.core.bezier_curve_3();
+	equal(bz.num_points(), 0);
+	
 });
 
 test("No Points", function () {
-	expect(1);
 
-	try {
-		var bz = BEZIER.core.bezier_curve_3([]);
-	} catch (e) {
-		equal(e.name, "IllegalArgumentError", "Throws error when no control point are given.");	
-	}
+	var bz = BEZIER.core.bezier_curve_3([]);
+	equal(bz.num_points(), 0);
+	
+	ok( !bz.calculate(0) )
+	
 });
 
 test("No Link Constructor", function () {

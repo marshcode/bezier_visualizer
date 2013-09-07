@@ -86,15 +86,37 @@ BEZIER.core.bezier_calculation = function (points, t) {
 
 BEZIER.core.bezier_curve_3 = function (control_points) {
 
-	if (!control_points || control_points.length === 0) {
-		throw BEZIER.errors.illegal_argument_error("Must supply initial control points to curve.");
+	if (control_points) {
+		control_points = control_points.slice();
+	} else {
+		control_points = [];
 	}
-	control_points = control_points.slice();
-	
 	
 	return {
 		get_point: function (idx) {
 			return control_points[idx];
+		},
+		
+		set_point: function (idx, new_point){
+			
+			var point = control_points[idx]
+			
+			point.x = new_point.x || point.x
+			point.y = new_point.y || point.y
+			point.z = new_point.z || point.z
+			
+		},
+		
+		add_point: function(new_point){
+			control_points.push(new_point);
+			return control_points.length - 1;
+		},
+		
+		remove_point: function(idx){
+			if(idx < 0 || idx >= control_points.length){
+				throw BEZIER.errors.illegal_argument_error("Index " + idx + " is out of range.");
+			}
+			control_points.splice(idx, 1);
 		},
 		
 		num_points: function () {
@@ -109,6 +131,10 @@ BEZIER.core.bezier_curve_3 = function (control_points) {
 						
 			if( t < 0 || t > 1 ){
 				throw BEZIER.errors.illegal_argument_error("T (" + t + ") argument is out of range: 0 < t < 1");
+			}
+			
+			if(this.num_points() == 0){
+				return null;
 			}
 			
 			for (var i = 0; i < this.num_points(); i++) {
