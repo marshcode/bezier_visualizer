@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DataGrid</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/lib/handsontable/jquery.handsontable.full.css" rel="stylesheet" media="screen">
+    
+    <style type="text/css">
+    	body{
+    		padding:2em;
+    	}
+    </style>
+    
+  </head>
+  <body>
+
+	<div id="example">
+	</div>
+
+	<input type="button" value="Swap Data" onclick="swap_data(data2);">
+
+
+    <script src="/lib/jquery/jquery.js"></script>
+	<script src="/lib/handsontable/jquery.handsontable.full.js"></script>
+
+	<script type="text/javascript">
+		var data1 = [
+		  {x:1, y:2, z:3, highlight:false},
+		  {x:4, y:5, z:6, highlight:false},
+		  {x:7, y:8, z:9, highlight:false},
+		];
+	
+		var data2 = [
+		  {x:11, y:12, z:13, highlight:false},
+		  {x:14, y:15, z:16, highlight:false},
+		  {x:17, y:18, z:19, highlight:false},
+		];
+	
+	
+	function swap_data(data_set){
+		container.handsontable("loadData", data_set);
+	}
+	
+	function not_empty(value, callback){
+	  	  if(value.length===0){
+	  	  	callback(false);
+	  	  }
+	  	  callback(true);
+	  }
+	
+	var container = $('#example');
+	container.handsontable({
+	  data: data1,
+	  minSpareRows: 1,
+	  contextMenu: ['row_above', 'row_below', 'remove_row','hsep3', 'undo', 'redo'],
+	  fillHandle: false,
+	  colHeaders: ['X', 'Y', 'Z', 'Highlight'],
+	  columns: [
+	    {data: 'x', type:"numeric", allowInvalid: false},
+	    {data: 'y', type:"numeric", allowInvalid: false},
+	    {data: 'z', type:"numeric", allowInvalid: false},
+	    {data: 'highlight', type:'checkbox', allowInvalid: false, readOnly: false},
+	  ],
+
+	  beforeChange: function(changes, source){
+		  	if(!changes){
+		  		return;
+		  	}
+	  	
+	  		$(changes).each( function(idx, change){
+	  		  	//typeof(change[3] == 'string' && change[3].length === 0
+	  			//redundant when new value is 0 but it catches all of the empty rows
+	  			if( !change[3] && change[1] != "highlight"){
+	  				changes[idx][3] = 0;
+	  			}
+	  		
+	  		});
+	  
+	  },
+
+	  afterChange: function(changes, source) {
+	  
+	  	if(!changes){
+	  		return;
+	  	}
+	  	var row, prop, old_val, new_val;
+	  	$(changes).each(function(idx, change){
+	  		row = change[0]; prop = change[1]; old_val = change[2]; new_val = change[3];
+	  		console.log("Row " + row + ", property " + prop + " changed from " + old_val + " to " + new_val)
+	  		//hook this up to the model changes. check old_val to new_val to avoid unnecessary updates
+	  	});
+
+	},
+
+
+	});
+	</script>
+	
+
+  </body>
+</html>
