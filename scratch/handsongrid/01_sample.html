@@ -40,14 +40,7 @@
 	function swap_data(data_set){
 		container.handsontable("loadData", data_set);
 	}
-	
-	function not_empty(value, callback){
-	  	  if(value.length===0){
-	  	  	callback(false);
-	  	  }
-	  	  callback(true);
-	  }
-	
+		
 	var container = $('#example');
 	container.handsontable({
 	  data: data1,
@@ -55,6 +48,7 @@
 	  contextMenu: ['row_above', 'row_below', 'remove_row','hsep3', 'undo', 'redo'],
 	  fillHandle: false,
 	  colHeaders: ['X', 'Y', 'Z', 'Highlight'],
+	  scrollH: 'none',
 	  columns: [
 	    {data: 'x', type:"numeric", allowInvalid: false},
 	    {data: 'y', type:"numeric", allowInvalid: false},

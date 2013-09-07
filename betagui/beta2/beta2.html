@@ -5,6 +5,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 				
+		<link href="/lib/handsontable/jquery.handsontable.full.css" rel="stylesheet" media="screen">
+				
 		<style>
 			body {
 				color: #000;
@@ -39,11 +41,14 @@
 
 	<body>
 		
-
+		<div id="grid_container" style="margin-right:25%;float:right;overflow:hidden;">
+		</div>
 	
 		<div id="viz_container" style="width:800px;position:relative;margin:20px 0 0 20px;">
 			<span id="dat_container" style="position:absolute;right:0px;"></span>
 		</div>
+		
+
 		
 
 		<script src="/lib/three/three.js"></script>
@@ -57,8 +62,11 @@
 		<script src="/lib/underscore/underscore-min.js"></script>
 		<script src="/lib/backbone/backbone-min.js"></script>
 		  
+		<script src="/lib/handsontable/jquery.handsontable.full.js"></script>
+		  
 		<script src="/js/core/bezier.js"></script>	
 		<script src="/js/core/storage.js"></script>	
+		<script src="/js/widgets/grids.js"></script>
 		<script src="/js/widgets/visualizers.js"></script>
 		<script src="/js/parsers/single.js"></script>
 
@@ -77,9 +85,24 @@
 										 function(curve_list){
 											var key = Object.keys(curve_list)[0]
 											load_curve(curve_list[key]); //not sure if this will hold up.  Does dat sort the keys before adding them?
-										  }
+										  },
+										  init_grid//curve must be loaded first.
 			]);
+			//GRID VISUALIZER
+			function init_grid(){
+				var cpg = BEZIER.widgets.control_point_grid(storage, "curve")
+				var container = $("#grid_container");
+				container.append(cpg.dom_element);
 				
+				//This will be handled by another grid object in beta3.  It will be some sort collection object that handles adding and removing
+				//each grid only handles editing.
+				storage.on(storage.EVENT_ADDED, function () {					
+					cpg.update();
+				});
+			}
+
+			
+			//CANVAS VISUALIZER
 			function init_viz(){
 				storage = BEZIER.storage.curve_storage();
 				viz3D = BEZIER.widgets.visualizer_3d(storage, 800, 800);
