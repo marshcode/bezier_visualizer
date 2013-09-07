@@ -62,6 +62,10 @@
 	    {data: 'highlight', type:'checkbox', allowInvalid: false, readOnly: false},
 	  ],
 
+	  afterRemoveRow: function(index){
+	  	console.log("Removed Row: " + index);
+	  },
+
 	  beforeChange: function(changes, source){
 		  	if(!changes){
 		  		return;
