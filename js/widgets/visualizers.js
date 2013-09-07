@@ -79,6 +79,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			scene.add(mesh.control_polygon);
 			scene.add(mesh.curve);
 			
+			that.update();
 		}
 	
 	curve_storage.on(curve_storage.EVENT_UPDATED, process_curve);
