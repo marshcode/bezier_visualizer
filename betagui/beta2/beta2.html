@@ -12,8 +12,6 @@
 				color: #000;
 				font-family:Monospace;
 				font-size:13px;
-				text-align:center;
-				font-weight: bold;
 
 				background-color: #fff;
 				margin: 0px;
@@ -41,7 +39,8 @@
 
 	<body>
 		
-		<div id="grid_container" style="margin-right:25%;float:right;overflow:hidden;">
+		<div id="grid_container" style="margin-right:25%;width:300px;;float:right;overflow:hidden;">
+			<input type="button" value="Append Row" />
 		</div>
 	
 		<div id="viz_container" style="width:800px;position:relative;margin:20px 0 0 20px;">
@@ -92,13 +91,16 @@
 			function init_grid(){
 				var cpg = BEZIER.widgets.control_point_grid(storage, "curve")
 				var container = $("#grid_container");
-				container.append(cpg.dom_element);
+				container.prepend(cpg.dom_element);
 				
 				//This will be handled by another grid object in beta3.  It will be some sort collection object that handles adding and removing
 				//each grid only handles editing.
 				storage.on(storage.EVENT_ADDED, function () {					
 					cpg.update();
 				});
+				
+				//how to dynamically add rows.  This button
+				//cpg.dom_element.handsontable('alter', 'insert_row', 2);
 			}
 
 			

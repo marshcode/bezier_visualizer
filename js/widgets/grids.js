@@ -10,41 +10,88 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 	
 	container.handsontable({
 		data: [],
-		minSpareRows: 1,
+		minSpareRows: 0,
 		contextMenu: ['row_above', 'row_below', 'remove_row', 'hsep3', 'undo', 'redo'],
 		fillHandle: false,
-		colHeaders: ['INDEX', 'X', 'Y', 'Z'], //, 'Highlight'],
+		colHeaders: ['X', 'Y', 'Z'], //, 'Highlight'],
+		rowHeaders: true,
 	    columns: [
-	        {data: 'index', type: "numeric", allowInvalid: false, readOnly:true},
 	        {data: 'x', type: "numeric", allowInvalid: false},
 	        {data: 'y', type: "numeric", allowInvalid: false},
 	        {data: 'z', type: "numeric", allowInvalid: false},
 	        //{data: 'highlight', type: 'checkbox', allowInvalid: false, readOnly: false}
 	    ],
 
-		afterRemoveRow: function (index) {},
+		afterRemoveRow: function (index) {
+		  	if(!storage.has_curve(curve_name)){
+				return
+			}
+		  	
+		  	var curve = storage.get_curve(curve_name);
+		  	curve.remove_point(index);
+		  	storage.updated(curve_name);
+		},
 
-		beforeChange: function (changes, source) {},
+		beforeChange: function (changes, source) {
+		  	if(!changes){
+		  		return;
+		  	}
+	  	
+	  		$(changes).each( function(idx, change){
+	  		  	//typeof(change[3] == 'string' && change[3].length === 0
+	  			//redundant when new value is 0 but it catches all of the empty rows
+	  			if( !change[3] && change[1] != "highlight"){
+	  				changes[idx][3] = 0;
+	  			}
+	  		});
+			
+			
+		},
 
-		afterChange: function (changes, source) {},
-
-	    cells: function (row, col, prop) {
-            var cellProperties = {};
-            cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
-            	Handsontable.TextCell.renderer.apply(this, arguments);
-                if (col === 0) {
-                    td.style.fontWeight = 'bold';
-                    td.style.color = 'black';
-                    td.style.background = '#EEE';
-                }else{
-                	td.style.fontWeight = 'normal';
-                }
-
-            };
-		    return cellProperties;
-		}
-	
+		afterChange: function (changes, source) {
+		  	if(!changes){
+		  		return;
+		  	}
+		  	if(!storage.has_curve(curve_name)){
+				return
+			}
+		  	
+			var curve = storage.get_curve(curve_name);
+		  	var row, prop, old_val, new_val;
+		  	var point;
+		  	$(changes).each(function(idx, change){
+		  		row = change[0]; prop = change[1]; old_val = change[2]; new_val = change[3];
+		  		point = curve.get_point(row);
+		  		
+		  		if(old_val === new_val){
+		  			return //nothing to do here
+		  		}
+		  		
+		  		if(prop === 'x'){
+		  			point.x = new_val;
+		  		}else if(prop === 'y'){
+		  			point.y = new_val;
+		  		}else if(prop === 'z'){
+		  			point.z = new_val;
+		  		}
+		  	});
+		  	
+		  	storage.updated(curve_name);
+		  	
+		},
 		
+		afterCreateRow: function(index){
+			if(!storage.has_curve(curve_name)){
+				return
+			}
+			
+			var curve = storage.get_curve(curve_name);
+			curve.insert_point(index, BEZIER.core.dim3(0, 0, 0));
+			storage.updated(curve_name);
+			
+		},
+		
+
 		
 	});
 	

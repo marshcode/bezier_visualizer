@@ -68,11 +68,27 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	};
 	
 	
-	function process_curve(curve_name) {
+	
+	function process_removed_curve(curve_name) {
+			
+			var mesh = curves[curve_name];
+			if (mesh) {
+				scene.remove(mesh.control_points);
+				scene.remove(mesh.control_polygon);
+				scene.remove(mesh.curve);	
+			}
+	
+			delete curves[curve_name];
+			
+		}
+	
+	function process_edited_curve(curve_name) {
 			
 			var radius = 0.25; //FIXME: hard coded for beta-1.
 			var curve = curve_storage.get_curve(curve_name);
 			var mesh = curve_factory(curve, radius, that.get_num_points());
+			
+			process_removed_curve(curve_name);
 			
 			curves[curve_name] = mesh;
 			scene.add(mesh.control_points);
@@ -82,21 +98,12 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			that.update();
 		}
 	
-	curve_storage.on(curve_storage.EVENT_UPDATED, process_curve);
-	curve_storage.on(curve_storage.EVENT_ADDED, process_curve);
 	
-	curve_storage.on(curve_storage.EVENT_CLEARED, function (curve_name) {
-		
-		var mesh = curves[curve_name];
-		if (mesh) {
-			scene.remove(mesh.control_points);
-			scene.remove(mesh.control_polygon);
-			scene.remove(mesh.curve);	
-		}
-
-		delete curves[curve_name];
-		
-	});
+	
+	curve_storage.on(curve_storage.EVENT_UPDATED, process_edited_curve);
+	curve_storage.on(curve_storage.EVENT_ADDED, process_edited_curve);
+	
+	curve_storage.on(curve_storage.EVENT_CLEARED, process_removed_curve);
 	
 	stage.camera_controls.addEventListener('change', render);
 	return that;
