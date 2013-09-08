@@ -44,7 +44,7 @@
 	var container = $('#example');
 	container.handsontable({
 	  data: data1,
-	  minSpareRows: 1,
+	  minSpareRows: 0,
 	  contextMenu: ['row_above', 'row_below', 'remove_row','hsep3', 'undo', 'redo'],
 	  fillHandle: false,
 	  colHeaders: ['X', 'Y', 'Z', 'Highlight'],
@@ -58,6 +58,10 @@
 
 	  afterRemoveRow: function(index){
 	  	console.log("Removed Row: " + index);
+	  },
+
+	  afterCreateRow: function(index, num){
+	  	console.log("Created "+ num +" rows at: "+ index)
 	  },
 
 	  beforeChange: function(changes, source){

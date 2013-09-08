@@ -18,20 +18,27 @@ test("Test edit Point", function () {
 		equal(pt.y, y);
 		equal(pt.z, z);
 	}
-	
+	//editing a point is accomplished by getting the point and modifying its properties.
 	var pt1 = BEZIER.core.dim3(0, 0, 0);
 	var bz = BEZIER.core.bezier_curve_3();
 	
 	bz.append_point(pt1);
 	
-	bz.edit_point(0, {x: 1});
+	bz.get_point(0).x = 1;
 	assert_pt(bz.get_point(0), 1, 0, 0);
 
-	bz.edit_point(0, {y: 2});
+	bz.get_point(0).y = 2;
 	assert_pt(bz.get_point(0), 1, 2, 0);
 
-	bz.edit_point(0, {z: 3});
+	bz.get_point(0).z = 3;
 	assert_pt(bz.get_point(0), 1, 2, 3);
+	
+	//check that you can edit more than one property
+	pt1 = bz.get_point(0);
+	pt1.x = 0
+	pt1.y = 0
+	
+	assert_pt(bz.get_point(0), 0, 0, 3);
 	
 });
 
@@ -96,7 +103,7 @@ test("Test Add Get edit Remove Point", function () {
 	
 	var pt1 = BEZIER.core.dim3(1, 2, 3);
 	var pt2 = BEZIER.core.dim3(4, 5, 6);
-	
+	var p_temp;
 	
 	var bz = BEZIER.core.bezier_curve_3();
 	equal(bz.num_points(), 0, "Make sure the curve starts out empty.");
@@ -112,7 +119,9 @@ test("Test Add Get edit Remove Point", function () {
 	equal(bz.get_point(idx1), pt1, "make sure the point 1 was stored correctly.");
 	equal(bz.get_point(idx2), pt2, "make sure the point 2 was stored correctly.");
 	
-	bz.edit_point(idx1, {x: 7, y: 8, z: 9});
+	p_temp = bz.get_point(idx1);
+	p_temp.x = 7; p_temp.y = 8; p_temp.z = 9;
+	
 	pt1 = bz.get_point(idx1);
 	equal(pt1.x, 7, "point 1 x equals 7");
 	equal(pt1.y, 8, "point 1 y equals 8");

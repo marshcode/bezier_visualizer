@@ -96,17 +96,7 @@ BEZIER.core.bezier_curve_3 = function (control_points) {
 		get_point: function (idx) {
 			return control_points[idx];
 		},
-		
-		edit_point: function (idx, new_point){
-			
-			var point = control_points[idx]
-			
-			point.x = new_point.x || point.x
-			point.y = new_point.y || point.y
-			point.z = new_point.z || point.z
-			
-		},
-		
+				
 		append_point: function(new_point){
 			control_points.push(new_point);
 			return control_points.length - 1;
