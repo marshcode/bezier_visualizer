@@ -1,6 +1,6 @@
 /*global THREE */ 
 /*global assert */
-
+/*global $ */
 
 
 var BEZIER = BEZIER || {};
@@ -29,6 +29,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 
 	var stage = stage_factory(width || 500, height || 500);	
 	var scene = stage.make_scene();
+	
 	
 	var render_trigger = false;
 	function render() {
@@ -63,8 +64,53 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			if (!render_trigger) {
 				render();
 			}
-		}
+		},
 		
+		auto_camera: function () {
+			
+			var curve_names = curve_storage.get_curve_names();
+			var centers = [];
+			var lookx = 0, looky = 0, lookz = 0;
+			var maxx = null, maxy = null, maxz = null;
+			
+			$(curve_names).each(function (idx, curve_name) {
+				var curve = curve_storage.get_curve(curve_name);
+				var xavg = 0, yavg = 0, zavg = 0;
+				var num_points = curve.num_points();
+				
+				var pt;
+				for (var i = 0; i < curve.num_points(); i++) {
+					pt = curve.get_point(i);
+					xavg += pt.x;
+					yavg += pt.y;
+					zavg += pt.z;
+					
+					maxx = Math.max(pt.x, maxx);
+					maxy = Math.max(pt.y, maxy);
+					maxz = Math.max(pt.z, maxz);				
+				}
+				
+				lookx += (xavg / num_points);
+				looky += (yavg / num_points);
+				lookz += (zavg / num_points);
+				
+			});		
+		
+			lookx /= curve_names.length;
+			looky /= curve_names.length;
+			lookz /= curve_names.length;
+			
+			stage.camera_controls.target = new THREE.Vector3(lookx, looky, lookz);	
+			
+			stage.camera.up.set( 0, 0, 1 );
+			stage.camera.position = new THREE.Vector3(maxx * 2, maxy * 2, maxz * 2);
+			stage.camera.rotation = new THREE.Vector3(0, 0, 0);
+			stage.camera.updateMatrix();
+			
+			this.update();
+			
+			
+		}
 	};
 	
 	

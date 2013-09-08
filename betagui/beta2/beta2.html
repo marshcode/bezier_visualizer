@@ -131,19 +131,39 @@
 					load_curves(curve_list_url, [init_dat]);
 				}
 
+				controller.auto_camera = function (){
+					viz3D.auto_camera();
+				}
+
 				controller.curve_list = "";				
 
 				var dat_container = $("#dat_container")
 				var gui = new dat.GUI({ autoPlace: false });
 				
+				/////////////////////////
+				//LOAD CURVES
+				/////////////////////////
+				var load_curve_folder = gui.addFolder('Load Curves');
 				
-				var refresh_curve = gui.add(controller, 'refresh_curve').name("Refresh Curve List");
-				var curve_list = gui.add(controller, 'curve_list', item_list ).name("Curve List");
-				gui.add(controller, 'clear_curve').name("Clear Curve");
+				var curve_list = load_curve_folder.add(controller, 'curve_list', item_list ).name("Curve List");
+				var refresh_curve = load_curve_folder.add(controller, 'refresh_curve').name("Refresh");
+				
 				
 				curve_list.onChange( function(e){
 					load_curve(controller.curve_list)
 				});
+				
+				/////////////////////////
+				//EDIT CURVES
+				/////////////////////////
+				var edit_curve_folder = gui.addFolder('Edit Curves');
+				edit_curve_folder.add(controller, 'clear_curve').name("Clear Curve");
+	
+				/////////////////////////
+				//VIEW CURVES
+				/////////////////////////
+				var edit_curve_folder = gui.addFolder('View');
+				edit_curve_folder.add(controller, 'auto_camera').name("Auto Camera");
 				
 				
 				dat_container.append(gui.domElement);
