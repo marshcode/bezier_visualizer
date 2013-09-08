@@ -22,7 +22,7 @@ BEZIER.storage.curve_storage = function () {
 			this.trigger(this.EVENT_UPDATED, name);
 		},
 		
-		get_curve_names: function (name) {
+		get_curve_names: function () {
 			var l = [];
 			for (var key in curves) {
 			    if (curves.hasOwnProperty(key)) {
