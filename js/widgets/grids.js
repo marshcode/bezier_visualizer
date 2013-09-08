@@ -117,8 +117,7 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 				
 				for (var i = 0; i < curve.num_points(); i++) {
 					pt = curve.get_point(i);
-					data.push({index:i,
-							   x: pt.x, 
+					data.push({x: pt.x, 
 							   y: pt.y, 
 							   z: pt.z});
 				}
