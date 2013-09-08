@@ -107,7 +107,7 @@ BEZIER.core.bezier_curve_3 = function (control_points) {
 			
 		},
 		
-		add_point: function(new_point){
+		append_point: function(new_point){
 			control_points.push(new_point);
 			return control_points.length - 1;
 		},

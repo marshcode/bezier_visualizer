@@ -22,7 +22,7 @@ test("Test edit Point", function () {
 	var pt1 = BEZIER.core.dim3(0, 0, 0);
 	var bz = BEZIER.core.bezier_curve_3();
 	
-	bz.add_point(pt1);
+	bz.append_point(pt1);
 	
 	bz.edit_point(0, {x: 1});
 	assert_pt(bz.get_point(0), 1, 0, 0);
@@ -101,11 +101,11 @@ test("Test Add Get edit Remove Point", function () {
 	var bz = BEZIER.core.bezier_curve_3();
 	equal(bz.num_points(), 0, "Make sure the curve starts out empty.");
 	
-	var idx1 = bz.add_point(pt1);
+	var idx1 = bz.append_point(pt1);
 	equal(bz.num_points(), 1, "We should now have one point.");
 	equal(idx1, 0, "The added point has index 0.");
 	
-	var idx2 = bz.add_point(pt2);
+	var idx2 = bz.append_point(pt2);
 	equal(bz.num_points(), 2, "Curve now has two points.");
 	equal(idx2, 1, "Second point has index 1.");
 	
@@ -129,7 +129,7 @@ test("Test Add Get edit Remove Point", function () {
 
 test("Remove Point out of range", function () {
 	var bz = BEZIER.core.bezier_curve_3();
-	bz.add_point(BEZIER.core.dim3(1, 2, 3));
+	bz.append_point(BEZIER.core.dim3(1, 2, 3));
 	expect(2);
 	
 	try {
