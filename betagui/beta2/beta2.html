@@ -40,7 +40,7 @@
 	<body>
 		
 		<div id="grid_container" style="margin-right:25%;width:300px;;float:right;overflow:hidden;">
-			<input type="button" value="Append Row" />
+			<input id="grid_append" type="button" value="Append Row" />
 		</div>
 	
 		<div id="viz_container" style="width:800px;position:relative;margin:20px 0 0 20px;">
@@ -91,6 +91,8 @@
 			function init_grid(){
 				var cpg = BEZIER.widgets.control_point_grid(storage, "curve")
 				var container = $("#grid_container");
+				var append_button = $("#grid_append");
+				
 				container.prepend(cpg.dom_element);
 				
 				//This will be handled by another grid object in beta3.  It will be some sort collection object that handles adding and removing
@@ -99,8 +101,10 @@
 					cpg.update();
 				});
 				
-				//how to dynamically add rows.  This button
-				//cpg.dom_element.handsontable('alter', 'insert_row', 2);
+				append_button.click( function(){
+					var count = cpg.dom_element.handsontable('countRows');
+					cpg.dom_element.handsontable('alter', 'insert_row', count);
+				});
 			}
 
 			
