@@ -97,7 +97,7 @@ BEZIER.core.bezier_curve_3 = function (control_points) {
 			return control_points[idx];
 		},
 		
-		set_point: function (idx, new_point){
+		edit_point: function (idx, new_point){
 			
 			var point = control_points[idx]
 			
@@ -110,6 +110,14 @@ BEZIER.core.bezier_curve_3 = function (control_points) {
 		add_point: function(new_point){
 			control_points.push(new_point);
 			return control_points.length - 1;
+		},
+		
+		insert_point: function(idx, new_point){
+			if(idx < 0 || idx >= control_points.length){
+				throw BEZIER.errors.illegal_argument_error("Index " + idx + " is out of range.");
+			}
+			
+			control_points.splice(idx, 0, new_point);
 		},
 		
 		remove_point: function(idx){

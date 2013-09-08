@@ -9,7 +9,7 @@
 
 module("BezierCurve - BezierCurve3");
 
-test("Test Set Point", function () {
+test("Test edit Point", function () {
 	
 	
 	function assert_pt(pt, x, y, z) {
@@ -24,18 +24,66 @@ test("Test Set Point", function () {
 	
 	bz.add_point(pt1);
 	
-	bz.set_point(0, {x: 1});
+	bz.edit_point(0, {x: 1});
 	assert_pt(bz.get_point(0), 1, 0, 0);
 
-	bz.set_point(0, {y: 2});
+	bz.edit_point(0, {y: 2});
 	assert_pt(bz.get_point(0), 1, 2, 0);
 
-	bz.set_point(0, {z: 3});
+	bz.edit_point(0, {z: 3});
 	assert_pt(bz.get_point(0), 1, 2, 3);
 	
 });
 
-test("Test Add Get Set Remove Point", function () {
+test("Test Insert Point Out Of Range", function (){
+	
+	expect(2);
+	
+	var bz = BEZIER.core.bezier_curve_3([
+	                                     BEZIER.core.dim3(0, 0, 0),
+	                                     BEZIER.core.dim3(2, 2, 2),
+	                                     ]);
+
+	try{
+		bz.insert_point(-1, BEZIER.core.dim3(0, 0, 0))
+	} catch (e) {
+		ok(true, "Insert Point raised an error when the desired index was less than 0.");
+	}
+
+	try{
+		bz.insert_point(2, BEZIER.core.dim3(0, 0, 0))
+	} catch (e) {
+		ok(true, "Insert Point raised an error when the desired index was greater than the point length.");
+	}
+	
+});
+
+
+test("Test Insert Point", function () {
+	var bz = BEZIER.core.bezier_curve_3([
+	                                     BEZIER.core.dim3(0, 0, 0),
+	                                     BEZIER.core.dim3(2, 2, 2),
+	                                     ]);
+
+	
+	var pt1 = bz.get_point(1);
+	equal(pt1.x, 2);
+	equal(pt1.y, 2);
+	equal(pt1.z, 2);
+	
+	bz.insert_point(1, BEZIER.core.dim3(1, 1, 1))
+	
+	var pt2 = bz.get_point(1);
+	equal(pt2.x, 1);
+	equal(pt2.y, 1);
+	equal(pt2.z, 1);
+	
+	
+	ok(pt1 !== pt2);
+	equal(bz.num_points(), 3);
+});
+
+test("Test Add Get edit Remove Point", function () {
 	
 	var pt1 = BEZIER.core.dim3(1, 2, 3);
 	var pt2 = BEZIER.core.dim3(4, 5, 6);
@@ -55,7 +103,7 @@ test("Test Add Get Set Remove Point", function () {
 	equal(bz.get_point(idx1), pt1, "make sure the point 1 was stored correctly.");
 	equal(bz.get_point(idx2), pt2, "make sure the point 2 was stored correctly.");
 	
-	bz.set_point(idx1, {x: 7, y: 8, z: 9});
+	bz.edit_point(idx1, {x: 7, y: 8, z: 9});
 	pt1 = bz.get_point(idx1);
 	equal(pt1.x, 7, "point 1 x equals 7");
 	equal(pt1.y, 8, "point 1 y equals 8");
