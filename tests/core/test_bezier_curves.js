@@ -78,6 +78,15 @@ test("Test Insert Point", function () {
 	equal(pt2.y, 1);
 	equal(pt2.z, 1);
 	
+	var pt3 = bz.get_point(2);
+	equal(pt3.x, 2);
+	equal(pt3.y, 2);
+	equal(pt3.z, 2);
+	
+	var pt0 = bz.get_point(0);
+	equal(pt0.x, 0);
+	equal(pt0.y, 0);
+	equal(pt0.z, 0);
 	
 	ok(pt1 !== pt2);
 	equal(bz.num_points(), 3);
