@@ -76,7 +76,6 @@
 			var viz3D;
 			var storage;
 			var curve_list_url = "curves/curve.list"			
-			
 		
 			init_viz();
 			animate();
@@ -174,7 +173,7 @@
 			//Curve Ajax
 			//////////////////////
 			function load_curve(url){
-				$.ajax({url: url}).done(function ( data ) {
+				$.ajax({url: url, cache: false}).done(function ( data ) {
 					var curve = BEZIER.parsers.single(data);
 					storage.clear_curve("curve");
 					storage.set_curve("curve", curve);
