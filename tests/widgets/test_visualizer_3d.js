@@ -6,7 +6,7 @@
 /*global throws */
 /*global fuzzy_equal */ 
 /*global BEZIER */ 
-
+/*global THREE */ 
 
 module("Widgets - visualizer_3d");
 
@@ -15,7 +15,7 @@ function create_curve_3d() {
 	return BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0, 0, 0), BEZIER.core.dim3(1, 1, 1)]);
 }
 
-function create_curve_storage_3d(){
+function create_curve_storage_3d() {
 	return BEZIER.storage.curve_storage();
 }
 
@@ -26,10 +26,73 @@ function instrumented_renderer() {
 		stack: [],
 		instrument: function (curve, radius, num_points) {
 			this.stack.push([curve, radius, num_points]);
-			return {"control_ponts":null, "control_polygon":null, "curve":null};//not returning anything useful here.  Might come back to bite us?
+			return {"control_ponts": null, "control_polygon": null, "curve": null};//not returning anything useful here.  Might come back to bite us?
 		}
 	};
 }
+
+function vectors_equal(v1, v2){
+	console.log(v1);
+	v1.sub(v1, v2);
+	return v1.length() == 0;
+	
+}
+
+test("Set View - Blank Target", function () {
+	expect(3);
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	
+	var old_view = viz3.get_view();
+	
+	try {
+		viz3.set_view();
+	}catch (e) {
+		equal(e.name, "IllegalArgumentError", e.message);
+	}
+	
+	var new_view = viz3.get_view();
+	ok(vectors_equal(old_view.target, new_view.target), "Target vectors should match the original");
+	ok(vectors_equal(old_view.position, new_view.position), "Position vectors match the original");
+	
+});
+
+test("Set/Get View - Blank Position", function () {
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	
+	var old_view = viz3.get_view();
+	
+	var new_target = new THREE.Vector3(1, 2, 3);
+	viz3.set_view(new_target);
+	var new_view = viz3.get_view();
+	
+	ok(!vectors_equal(old_view.target, new_view.target), "Target vectors should not match the original");
+	ok(vectors_equal(new_target, new_view.target), "Target should matc new vector");	
+	ok(vectors_equal(old_view.position, new_view.position), "Position vectors should match the original");
+});
+
+test("Set View - Normal", function () {
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	
+	var new_target = new THREE.Vector3(1, 2, 3);
+	var new_position = new THREE.Vector3(4, 5, 6);
+	
+	var old_view = viz3.get_view();
+	viz3.set_view(new_target, new_position);
+	var new_view = viz3.get_view();
+	
+	ok(!vectors_equal(old_view.target, new_view.target), "Target vectors should not match the original");
+	ok(!vectors_equal(old_view.position, new_view.position), "Position vectors should not match the original");
+	
+	ok(vectors_equal(new_target, new_view.target), "Target should match new vector");	
+	ok(vectors_equal(new_position, new_view.position), "Position should match new vector");
+	
+});
+
+
+
 
 test("Empty Constructor", function () {
 	expect(1);

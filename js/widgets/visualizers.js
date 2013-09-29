@@ -66,74 +66,24 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			}
 		},
 		
-		auto_camera: function () {
-			
-			var curve_names = curve_storage.get_curve_names();
-			var centers = [];
-			var lookx = 0, looky = 0, lookz = 0;
-			var maxx = null, maxy = null, maxz = null;
-			var minx = null, miny = null, minz = null;
-			var rangex, rangey, rangez;
-			
-			$(curve_names).each(function (idx, curve_name) {
-				var curve = curve_storage.get_curve(curve_name);
-				var xavg = 0, yavg = 0, zavg = 0;
-				var num_points = curve.num_points();
-				
-				var pt;
-				for (var i = 0; i < curve.num_points(); i++) {
-					pt = curve.get_point(i);
-					xavg += pt.x;
-					yavg += pt.y;
-					zavg += pt.z;
-					
-					maxx = Math.max(pt.x, maxx);
-					maxy = Math.max(pt.y, maxy);
-					maxz = Math.max(pt.z, maxz);				
-				
-					minx = Math.min(pt.x, minx);
-					miny = Math.min(pt.y, miny);
-					minz = Math.min(pt.z, minz);	
-				
-				}
-				
-				lookx += (xavg / num_points);
-				looky += (yavg / num_points);
-				lookz += (zavg / num_points);
-				
-			});		
+		get_view: function () {
+			return {"target": stage.camera_controls.target.clone(),
+				    "position": stage.camera_controls.object.position.clone()};
+		},
 		
-			lookx /= curve_names.length;
-			looky /= curve_names.length;
-			lookz /= curve_names.length;
+		set_view: function (target, position) {
 			
-			rangex = maxx - minx;
-			rangey = maxy - miny;
-			rangez = maxz - minz;
-			
-			//check for a dimension that did not move at all.  If we find one, this implies that the curve lies in the 2D plane.  
-			//Bounding boxes will not work properly for this.  Set to the center of the other two
-			var position = new THREE.Vector3(maxx * 2, maxy * 2, maxz * 2);
-			var target   = new THREE.Vector3(lookx, looky, lookz);	
-			//TODO: the 50 here is juat a random hardcode.  The real solution is much more complicated.	
-			if (rangex === 0){
-				position = new THREE.Vector3(50, looky, lookz);
-			}else if (rangey === 0){
-				position = new THREE.Vector3(lookx, 50, lookz);
-			}else if (rangez === 0){
-				position = new THREE.Vector3(lookx, looky, 50);
+			if(!target){
+				throw BEZIER.errors.illegal_argument_error("Target cannot be null.");
 			}
 			
-			
-			stage.camera_controls.target = target
-			stage.camera_controls.object.position = position;
-
+			stage.camera_controls.target = target.clone();
+			if(position){
+				stage.camera_controls.object.position = position.clone();
+			}
 			
 			this.update();
-			
-			return {target: BEZIER.core.dim3(target.x, target.y, target.z),
-				    position: BEZIER.core.dim3(position.x, position.y, position.z)};
-		}
+		},
 	};
 	
 	
