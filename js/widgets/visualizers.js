@@ -69,7 +69,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		get_view: function () {
 			var target = stage.camera_controls.target;
 			var position = stage.camera_controls.object.position;
-			
+			//copying the positions protects them from outside modification
 			return {"target": BEZIER.core.dim3(target.x, target.y, target.z),
 				    "position": BEZIER.core.dim3(position.x, position.y, position.z)};
 		},
@@ -80,6 +80,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 				throw BEZIER.errors.illegal_argument_error("Target cannot be null.");
 			}
 			
+			//copying the positions protects them from outside modification
 			stage.camera_controls.target = new THREE.Vector3(target.x, target.y, target.z);
 			if(position){
 				stage.camera_controls.object.position = new THREE.Vector3(position.x, position.y, position.z);
