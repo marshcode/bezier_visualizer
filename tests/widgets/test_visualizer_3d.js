@@ -31,10 +31,8 @@ function instrumented_renderer() {
 	};
 }
 
-function vectors_equal(v1, v2){
-	console.log(v1);
-	v1.sub(v1, v2);
-	return v1.length() == 0;
+function vectors_equal(d1, d2){
+	return d1.x == d2.x && d1.y == d2.y && d1.z == d2.z;
 	
 }
 
@@ -63,7 +61,7 @@ test("Set/Get View - Blank Position", function () {
 	
 	var old_view = viz3.get_view();
 	
-	var new_target = new THREE.Vector3(1, 2, 3);
+	var new_target = BEZIER.core.dim3(1, 2, 3);
 	viz3.set_view(new_target);
 	var new_view = viz3.get_view();
 	
@@ -76,8 +74,8 @@ test("Set View - Normal", function () {
 	var curve_storage = create_curve_storage_3d();
 	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
 	
-	var new_target = new THREE.Vector3(1, 2, 3);
-	var new_position = new THREE.Vector3(4, 5, 6);
+	var new_target = BEZIER.core.dim3(1, 2, 3);
+	var new_position = BEZIER.core.dim3(4, 5, 6);
 	
 	var old_view = viz3.get_view();
 	viz3.set_view(new_target, new_position);
@@ -91,7 +89,30 @@ test("Set View - Normal", function () {
 	
 });
 
-
+test("Set View - No Object Modification", function () {
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+		
+	var modified_view = viz3.get_view();
+	var old_view = viz3.get_view();
+	
+	modified_view.position.x = 10;
+	modified_view.position.y = 11;
+	modified_view.position.z = 12;
+	
+	modified_view.target.x = 10;
+	modified_view.target.y = 11;
+	modified_view.target.z = 12;
+	
+	var new_view = viz3.get_view();
+	
+	ok(!vectors_equal(modified_view.target, new_view.target), "Target vector should not be modified.");
+	ok(!vectors_equal(modified_view.position, new_view.position), "Position vector should not be modified.");
+	
+	ok(vectors_equal(old_view.target, new_view.target), "Target should match original target.");	
+	ok(vectors_equal(old_view.position, new_view.position), "Position should match original position.");
+	
+});
 
 
 test("Empty Constructor", function () {
