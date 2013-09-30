@@ -106,7 +106,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			}
 			var options = curve_info.options;			
 
-			if(is_visible !== null){
+			if (is_visible !== null) {
 				options.points_visible = Boolean(is_visible);
 				set_visible(curve_info.meshes.control_points, options.points_visible);				
 			}
@@ -119,7 +119,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			}
 			var options = curve_info.options;			
 
-			if(is_visible !== null){
+			if (is_visible !== null) {
 				options.polygon_visible = Boolean(is_visible);
 				set_visible(curve_info.meshes.control_polygon, options.polygon_visible);				
 			}
@@ -131,7 +131,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			}
 			var options = curve_info.options;			
 
-			if(is_visible !== null){
+			if (is_visible !== null) {
 				options.curve_visible = Boolean(is_visible);
 				set_visible(curve_info.meshes.curve, options.curve_visible);
 			}
