@@ -1,7 +1,7 @@
 /*global THREE */ 
 /*global assert */
 /*global $ */
-
+/*global jQuery */
 
 var BEZIER = BEZIER || {};
 BEZIER.widgets = BEZIER.widgets  || {};
@@ -16,7 +16,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	//FIXME: constructor is getting a little long.  Consider adding some setters and making some sensible defaults
 	//it is also getting tougher to understand the constructor since a lot of the arguments are simple integers
 	
-	if(!curve_storage){
+	if (!curve_storage) {
 		throw BEZIER.errors.illegal_argument_error("curve_storage cannot be null");
 	}
 	
@@ -26,7 +26,12 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	
 	
 	var curves = {};
-
+	var default_options = {points_visible:  true,
+						   control_polygon_visible: true,
+						   curve_visible:   true};
+	
+	
+	
 	var stage = stage_factory(width || 500, height || 500);	
 	var scene = stage.make_scene();
 	
@@ -52,11 +57,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		set_curve_factory: function (_curve_factory) {
 			curve_factory  = _curve_factory || curve_factory;
 		},
-		
-		get_dom_element: function () {
-			return stage.renderer.domElement;
-		},
-		
+				
 		update: function () {
 			render_trigger = false;
 			stage.camera_controls.update();
@@ -66,6 +67,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			}
 		},
 		
+		////////RENDERING OPTIONS////////////
 		get_view: function () {
 			var target = stage.camera_controls.target;
 			var position = stage.camera_controls.object.position;
@@ -76,29 +78,69 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		
 		set_view: function (target, position) {
 			
-			if(!target){
+			if (!target) {
 				throw BEZIER.errors.illegal_argument_error("Target cannot be null.");
 			}
 			
 			//copying the positions protects them from outside modification
 			stage.camera_controls.target = new THREE.Vector3(target.x, target.y, target.z);
-			if(position){
+			if (position) {
 				stage.camera_controls.object.position = new THREE.Vector3(position.x, position.y, position.z);
 			}
 			
 			this.update();
 		},
+		
+
+		set_visibility: function(curve_name, points, polygon, curve){
+			var curve_info = curves[curve_name];
+			if(!curve_info){
+				return
+			}
+			var options = curve_info.options;
+				
+			function set_visible(threeobj, value){
+				threeobj.traverse(function(o){
+					o.visible = value;
+				});
+			}
+			
+			if(points !== null){
+				options.points_visible = Boolean(points);
+				set_visible(curve_info.meshes.control_points, options.points_visible);				
+			}
+
+			if(polygon !== null){
+				options.control_polygon_visible = Boolean(polygon);
+				set_visible(curve_info.meshes.control_polygon, options.control_polygon_visible);
+			}
+
+			if(curve !== null){
+				options.curve_visible = Boolean(curve);
+				console.log(options.curve_visible);
+				set_visible(curve_info.meshes.curve, options.curve_visible);
+			}
+			
+		},
+		
+		
+		//////////DOM Manipulaion/////////////////////
+		get_dom_element: function () {
+			return stage.renderer.domElement;
+		}
+		
 	};
 	
 	
 	
 	function process_removed_curve(curve_name) {
 			
-			var mesh = curves[curve_name];
-			if (mesh) {
-				scene.remove(mesh.control_points);
-				scene.remove(mesh.control_polygon);
-				scene.remove(mesh.curve);	
+			var curve = curves[curve_name];
+			if (curve) {
+				var meshes = curve.meshes;
+				scene.remove(meshes.control_points);
+				scene.remove(meshes.control_polygon);
+				scene.remove(meshes.curve);	
 			}
 	
 			delete curves[curve_name];
@@ -109,14 +151,20 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			
 			var radius = 0.25; //FIXME: hard coded for beta-1.
 			var curve = curve_storage.get_curve(curve_name);
-			var mesh = curve_factory(curve, radius, that.get_num_points());
+			var meshes = curve_factory(curve, radius, that.get_num_points());
+			var options = jQuery.extend({}, default_options);
+			
+			var previous_curve = curves[curve_name];
+			if (previous_curve) {
+				options = previous_curve.options;
+			}
 			
 			process_removed_curve(curve_name);
 			
-			curves[curve_name] = mesh;
-			scene.add(mesh.control_points);
-			scene.add(mesh.control_polygon);
-			scene.add(mesh.curve);
+			curves[curve_name] = {meshes: meshes, options: options};
+			scene.add(meshes.control_points);
+			scene.add(meshes.control_polygon);
+			scene.add(meshes.curve);
 			
 			that.update();
 		}
@@ -243,7 +291,7 @@ BEZIER.widgets.stage_basic = function (width, height) {
 	return {
 		camera:          camera,
 		camera_controls: camera_controls,
-		make_scene:           make_scene,
+		make_scene:      make_scene,
 		renderer:        renderer
 
 	};

@@ -36,6 +36,19 @@ function vectors_equal(d1, d2){
 	
 }
 
+test("Set Visibility - all false", function () {
+	expect(0);
+	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
+	
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	var curve = create_curve_3d();
+	var curve_name = "curve";
+	
+	viz3.set_visibility(false, false, false);
+	
+});
+
 test("Set View - Blank Target", function () {
 	expect(3);
 	var curve_storage = create_curve_storage_3d();
