@@ -28,7 +28,8 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	var curves = {};
 	var default_options = {points_visible:  true,
 						   polygon_visible: true,
-						   curve_visible:   true};
+						   curve_visible:   true,
+						   size:          0.25};
 	
 	
 	
@@ -111,7 +112,14 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			this.update();
 		},
 		
-
+		set_curve_size: function (curve_name, radius){
+			var curve_info = curves[curve_name];
+			if (!curve_info) {
+				return;
+			}
+			var options = curve_info.options;
+			options.size = Math.max(radius, 0);
+		},
 		
 		set_points_visibility: function (curve_name, is_visible) {
 			set_visibility_helper(curve_name, is_visible, "points_visible", "control_points");
@@ -149,15 +157,16 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	
 	function process_edited_curve(curve_name) {
 			
-			var radius = 0.25; //FIXME: hard coded for beta-1.
-			var curve = curve_storage.get_curve(curve_name);
-			var meshes = curve_factory(curve, radius, that.get_num_points());
-			var options = jQuery.extend({}, default_options);
-			
 			var previous_curve = curves[curve_name];
+			var options = null;
 			if (previous_curve) {
 				options = previous_curve.options;
+			} else {
+				options = jQuery.extend({}, default_options);
 			}
+		
+			var curve = curve_storage.get_curve(curve_name);
+			var meshes = curve_factory(curve, options.size, that.get_num_points());
 			
 			process_removed_curve(curve_name);
 			

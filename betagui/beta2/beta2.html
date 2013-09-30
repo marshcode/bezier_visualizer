@@ -142,6 +142,8 @@
 				controller.control_polygon_visible = true;
 				controller.curve_visible = true;
 
+				controller.size = 0.25;
+
 				var dat_container = $("#dat_container")
 				var gui = new dat.GUI({ autoPlace: false });
 				
@@ -165,6 +167,13 @@
 				var view_curve_folder = gui.addFolder('View');
 				view_curve_folder.add(controller, 'auto_frame').name("Auto Frame");
 				
+				var size_handle = view_curve_folder.add(controller, 'size', 0, 1).name('Size');
+				size_handle.onChange(function(curve_size){
+					console.log(curve_size);
+					viz3D.set_curve_size(curve_name, curve_size);
+					storage.updated(curve_name);
+				});
+				
 				var point_handle = view_curve_folder.add(controller, 'points_visible').name("Points Visible");
 				var polygon_handle = view_curve_folder.add(controller, 'control_polygon_visible').name("Polygon Visible");
 				var curve_handle = view_curve_folder.add(controller, 'curve_visible').name("Curve Visible");
@@ -182,6 +191,7 @@
 					viz3D.update();
 				});				
 				
+				
 				///////////////////
 				//LOAD CURVE 2: callbacks
 				///////////////////
@@ -190,6 +200,7 @@
 					point_handle.setValue(true);
 					polygon_handle.setValue(true);
 					curve_handle.setValue(true);
+					size_handle.setValue(0.25);
 					
 				});
 				
