@@ -42,11 +42,25 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		render_trigger = true;
 	}
 		
-	function set_visible(threeobj, value) {
-		threeobj.traverse(function (o) {
-			o.visible = value;
-		});
+	
+	function set_visibility_helper(curve_name, is_visible, option_name, mesh_name) {
+		var curve_info = curves[curve_name];
+		if (!curve_info) {
+			return;
+		}
+		var options = curve_info.options;			
+		var mesh = curve_info.meshes[mesh_name];
+		
+		if (is_visible !== null) {
+			options[option_name] = Boolean(is_visible);
+			mesh.traverse(function (o) {
+				o.visible = is_visible;
+			});				
+		}
 	}
+	
+	
+
 	
 	var that = {
 		/////////POINTS//////////
@@ -100,41 +114,14 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 
 		
 		set_points_visibility: function (curve_name, is_visible) {
-			var curve_info = curves[curve_name];
-			if (!curve_info) {
-				return;
-			}
-			var options = curve_info.options;			
-
-			if (is_visible !== null) {
-				options.points_visible = Boolean(is_visible);
-				set_visible(curve_info.meshes.control_points, options.points_visible);				
-			}
+			set_visibility_helper(curve_name, is_visible, "points_visible", "control_points");
 		},
 
 		set_polygon_visibility: function (curve_name, is_visible) {
-			var curve_info = curves[curve_name];
-			if (!curve_info) {
-				return;
-			}
-			var options = curve_info.options;			
-
-			if (is_visible !== null) {
-				options.polygon_visible = Boolean(is_visible);
-				set_visible(curve_info.meshes.control_polygon, options.polygon_visible);				
-			}
+			set_visibility_helper(curve_name, is_visible, "polygon_visible", "control_polygon");
 		},
 		set_curve_visibility: function (curve_name, is_visible) {
-			var curve_info = curves[curve_name];
-			if (!curve_info) {
-				return;
-			}
-			var options = curve_info.options;			
-
-			if (is_visible !== null) {
-				options.curve_visible = Boolean(is_visible);
-				set_visible(curve_info.meshes.curve, options.curve_visible);
-			}
+			set_visibility_helper(curve_name, is_visible, "curve_visible", "curve");
 		},		
 		
 		//////////DOM Manipulaion/////////////////////
