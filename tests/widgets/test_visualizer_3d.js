@@ -82,11 +82,22 @@ test("Set Curve Size", function () {
 	var curve_name = "curve";
 	
 	curve_storage.set_curve(curve_name, curve);
+	
 	viz3.set_curve_size(curve_name, 0.5);
 	var options = viz3.get_options(curve_name);
 	equal(options.size, 0.5);
 	
+	viz3.set_curve_size(curve_name, -1);
+	options = viz3.get_options(curve_name);
+	equal(options.size, 0);
+	
+	viz3.set_curve_size(curve_name, 1000);
+	options = viz3.get_options(curve_name);
+	equal(options.size, 1000);
 });
+
+
+
 
 test("Set Point Visibility", function () {
 
