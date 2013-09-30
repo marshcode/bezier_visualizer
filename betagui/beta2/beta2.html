@@ -153,11 +153,6 @@
 				var curve_list = load_curve_folder.add(controller, 'curve_list', item_list ).name("Curve List");
 				var refresh_curve = load_curve_folder.add(controller, 'refresh_curve').name("Refresh");
 				
-				
-				curve_list.onChange( function(e){
-					load_curve(controller.curve_list)
-				});
-				
 				/////////////////////////
 				//EDIT CURVES
 				/////////////////////////
@@ -186,6 +181,17 @@
 					viz3D.set_curve_visibility(curve_name, curve_visible);
 					viz3D.update();
 				});				
+				
+				///////////////////
+				//LOAD CURVE 2: callbacks
+				///////////////////
+				curve_list.onChange( function(e){
+					load_curve(controller.curve_list)
+					point_handle.setValue(true);
+					polygon_handle.setValue(true);
+					curve_handle.setValue(true);
+					
+				});
 				
 				
 				dat_container.append(gui.domElement);
