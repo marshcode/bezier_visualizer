@@ -175,15 +175,15 @@
 				var curve_handle = view_curve_folder.add(controller, 'curve_visible').name("Curve Visible");
 				
 				point_handle.onChange( function(point_visibility){
-					viz3D.set_visibility(curve_name, point_visibility, null, null)
+					viz3D.set_points_visibility(curve_name, point_visibility);
 					viz3D.update();
 				});
 				polygon_handle.onChange( function(polygon_visibility){
-					viz3D.set_visibility(curve_name, null, polygon_visibility, null);
+					viz3D.set_polygon_visibility(curve_name, polygon_visibility);
 					viz3D.update();
 				});				
 				curve_handle.onChange( function(curve_visible){
-					viz3D.set_visibility(curve_name, null, null, curve_visible);
+					viz3D.set_curve_visibility(curve_name, curve_visible);
 					viz3D.update();
 				});				
 				

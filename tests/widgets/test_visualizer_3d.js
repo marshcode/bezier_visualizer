@@ -36,7 +36,7 @@ function vectors_equal(d1, d2){
 	
 }
 
-test("Set Visibility - all false", function () {
+test("Set Point Visibility", function () {
 	expect(0);
 	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
 	
@@ -45,7 +45,34 @@ test("Set Visibility - all false", function () {
 	var curve = create_curve_3d();
 	var curve_name = "curve";
 	
-	viz3.set_visibility(false, false, false);
+	viz3.set_points_visibility(false);
+	
+});
+
+
+test("Set Polygon Visibility", function () {
+	expect(0);
+	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
+	
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	var curve = create_curve_3d();
+	var curve_name = "curve";
+	
+	viz3.set_polygon_visibility(false);
+	
+});
+
+test("Set Curve Visibility", function () {
+	expect(0);
+	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
+	
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	var curve = create_curve_3d();
+	var curve_name = "curve";
+	
+	viz3.set_curve_visibility(false);
 	
 });
 

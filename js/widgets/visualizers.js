@@ -27,7 +27,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	
 	var curves = {};
 	var default_options = {points_visible:  true,
-						   control_polygon_visible: true,
+						   polygon_visible: true,
 						   curve_visible:   true};
 	
 	
@@ -42,6 +42,12 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		render_trigger = true;
 	}
 		
+	function set_visible(threeobj, value) {
+		threeobj.traverse(function (o) {
+			o.visible = value;
+		});
+	}
+	
 	var that = {
 		/////////POINTS//////////
 		get_num_points: function () {
@@ -92,37 +98,44 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		},
 		
 
-		set_visibility: function(curve_name, points, polygon, curve){
+		
+		set_points_visibility: function (curve_name, is_visible) {
 			var curve_info = curves[curve_name];
-			if(!curve_info){
-				return
+			if (!curve_info) {
+				return;
 			}
-			var options = curve_info.options;
-				
-			function set_visible(threeobj, value){
-				threeobj.traverse(function(o){
-					o.visible = value;
-				});
-			}
-			
-			if(points !== null){
-				options.points_visible = Boolean(points);
+			var options = curve_info.options;			
+
+			if(is_visible !== null){
+				options.points_visible = Boolean(is_visible);
 				set_visible(curve_info.meshes.control_points, options.points_visible);				
 			}
+		},
 
-			if(polygon !== null){
-				options.control_polygon_visible = Boolean(polygon);
-				set_visible(curve_info.meshes.control_polygon, options.control_polygon_visible);
+		set_polygon_visibility: function (curve_name, is_visible) {
+			var curve_info = curves[curve_name];
+			if (!curve_info) {
+				return;
 			}
+			var options = curve_info.options;			
 
-			if(curve !== null){
-				options.curve_visible = Boolean(curve);
-				console.log(options.curve_visible);
+			if(is_visible !== null){
+				options.polygon_visible = Boolean(is_visible);
+				set_visible(curve_info.meshes.control_polygon, options.polygon_visible);				
+			}
+		},
+		set_curve_visibility: function (curve_name, is_visible) {
+			var curve_info = curves[curve_name];
+			if (!curve_info) {
+				return;
+			}
+			var options = curve_info.options;			
+
+			if(is_visible !== null){
+				options.curve_visible = Boolean(is_visible);
 				set_visible(curve_info.meshes.curve, options.curve_visible);
 			}
-			
-		},
-		
+		},		
 		
 		//////////DOM Manipulaion/////////////////////
 		get_dom_element: function () {
