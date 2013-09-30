@@ -169,7 +169,6 @@
 				
 				var size_handle = view_curve_folder.add(controller, 'size', 0, 1).name('Size');
 				size_handle.onChange(function(curve_size){
-					console.log(curve_size);
 					viz3D.set_curve_size(curve_name, curve_size);
 					storage.updated(curve_name);
 				});
@@ -195,12 +194,13 @@
 				///////////////////
 				//LOAD CURVE 2: callbacks
 				///////////////////
-				curve_list.onChange( function(e){
+				curve_list.onChange( function(e){				
 					load_curve(controller.curve_list)
-					point_handle.setValue(true);
-					polygon_handle.setValue(true);
-					curve_handle.setValue(true);
-					size_handle.setValue(0.25);
+					var options = viz3D.get_options("default");
+					point_handle.setValue(options.points_visible);
+					polygon_handle.setValue(options.polygon_visible);
+					curve_handle.setValue(options.curve_visible);
+					size_handle.setValue(options.size);
 					
 				});
 				

@@ -36,8 +36,44 @@ function vectors_equal(d1, d2){
 	
 }
 
-test("Set Point Visibility", function () {
-	expect(0);
+test("Get Options - get default options", function (){
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	var curve = create_curve_3d();
+
+	var default_options = viz3.get_options("default");
+	
+	equal(default_options.size, 0.25);
+	equal(default_options.points_visible,  true);
+	equal(default_options.polygon_visible, true);
+	equal(default_options.curve_visible,   true);
+	
+	
+});
+
+
+test("Get Options - initialized to defaults", function (){
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	var curve = create_curve_3d();
+	var curve_name = "curve";
+	
+	var options = viz3.get_options(curve_name);
+	equal(options, null);
+	
+	curve_storage.set_curve(curve_name, curve);
+	var options = viz3.get_options(curve_name);
+	
+	equal(options.size, 0.25);
+	equal(options.points_visible,  true);
+	equal(options.polygon_visible, true);
+	equal(options.curve_visible,   true);
+	
+	
+});
+
+test("Set Curve Size", function () {
+
 	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
 	
 	var curve_storage = create_curve_storage_3d();
@@ -45,35 +81,53 @@ test("Set Point Visibility", function () {
 	var curve = create_curve_3d();
 	var curve_name = "curve";
 	
-	viz3.set_points_visibility(false);
+	curve_storage.set_curve(curve_name, curve);
+	viz3.set_curve_size(curve_name, 0.5);
+	var options = viz3.get_options(curve_name);
+	equal(options.size, 0.5);
 	
+});
+
+test("Set Point Visibility", function () {
+
+	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
+	
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	var curve = create_curve_3d();
+	var curve_name = "curve";
+	
+	curve_storage.set_curve(curve_name, curve);
+	viz3.set_points_visibility(curve_name, false);
+	var options = viz3.get_options(curve_name);
+	equal(options.points_visible, false);
 });
 
 
 test("Set Polygon Visibility", function () {
-	expect(0);
-	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
 	
 	var curve_storage = create_curve_storage_3d();
 	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
 	var curve = create_curve_3d();
 	var curve_name = "curve";
 	
-	viz3.set_polygon_visibility(false);
-	
+	curve_storage.set_curve(curve_name, curve);
+	viz3.set_polygon_visibility(curve_name, false);
+	var options = viz3.get_options(curve_name);
+	equal(options.polygon_visible, false);
 });
 
 test("Set Curve Visibility", function () {
-	expect(0);
-	//no way to access the options and rendering won't do any good. for now, we test to make sure there are no exceptions.
-	
+
 	var curve_storage = create_curve_storage_3d();
 	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
 	var curve = create_curve_3d();
 	var curve_name = "curve";
 	
-	viz3.set_curve_visibility(false);
-	
+	curve_storage.set_curve(curve_name, curve);
+	viz3.set_curve_visibility(curve_name, false);
+	var options = viz3.get_options(curve_name);
+	equal(options.curve_visible, false);
 });
 
 test("Set View - Blank Target", function () {

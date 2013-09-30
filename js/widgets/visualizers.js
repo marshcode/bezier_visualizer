@@ -64,6 +64,21 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 
 	
 	var that = {
+		///////Options///////////	
+		get_options: function (curve_name) {
+			
+			if(curve_name === "default"){
+				return jQuery.extend({}, default_options);
+			}
+			
+			var curve_info = curves[curve_name];
+			if (!curve_info) {
+				return;
+			}
+			
+			return jQuery.extend({}, curve_info.options);
+		},
+			
 		/////////POINTS//////////
 		get_num_points: function () {
 			return num_points;
