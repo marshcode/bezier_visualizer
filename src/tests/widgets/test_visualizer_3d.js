@@ -20,7 +20,7 @@ function create_curve_storage_3d() {
 }
 
 function instrumented_renderer() {
-	
+	//rendering agent that can be used to inspect values passed to it.
 	
 	return {
 		stack: [],
@@ -114,7 +114,10 @@ test("Set Point Visibility", function () {
 	equal(options.points_visible, false);
 });
 
-
+//we need to actually test the 3D objects, not just the options dict
+//however, like I've said before.  The implementation changes often enough
+//that I'm not sure it would be worth it
+//this might be one of those things that needs to be tested manually?
 test("Set Polygon Visibility", function () {
 	
 	var curve_storage = create_curve_storage_3d();
@@ -140,6 +143,32 @@ test("Set Curve Visibility", function () {
 	var options = viz3.get_options(curve_name);
 	equal(options.curve_visible, false);
 });
+
+test("Set Visibility - Persist after edit", function () {
+	expect(3);
+	
+	var curve_storage = create_curve_storage_3d();
+	var viz3 = BEZIER.widgets.visualizer_3d(curve_storage, 500, 500);
+	var curve = create_curve_3d();
+	var curve_name = "curve";
+	
+	curve_storage.set_curve(curve_name, curve);
+	viz3.set_curve_visibility(curve_name, false);
+	viz3.set_points_visibility(curve_name, false);
+	viz3.set_polygon_visibility(curve_name, false);
+	
+	
+	curve_storage.on(curve_storage.EVENT_UPDATED, function () {
+		var options = viz3.get_options(curve_name);
+		equal(options.curve_visible, false);
+		equal(options.polygon_visible, false);
+		equal(options.points_visible, false);		
+	});
+	
+	curve_storage.updated(curve_name);
+	
+});
+
 
 test("Set View - Blank Target", function () {
 	expect(3);
