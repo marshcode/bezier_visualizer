@@ -1,19 +1,12 @@
+ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+PORT := 9090
 
-
-#PUBLIC COMMANDS
-
-start-server:_cmd_start-server _cmd_open-dir_cmd
+start-server:
+	@scripts/run_jscover.sh "$(ROOT_DIR)/lib/JSCover" "$(ROOT_DIR)" $(PORT)&
 	 
-stop-server:_cmd_stop-server
+stop-server:
+	@fuser -k $(PORT)/tcp
 
-#COMMAND SECTION:
-#these are generic commands to be used
-_cmd_start-server: 
-	@python -m SimpleHTTPServer 9090&
+test:
+	@sensible-browser "http://localhost:$(PORT)/jscoverage.html?/src/tests/test-runner.html"
 	
-#sketchy - I'm simply killing the process on port 9090. If it becomes a problem, we make python write a pid first
-_cmd_stop-server:
-	@fuser -k 9090/tcp
-	
-_cmd_open-dir_cmd:
-	@sensible-browser localhost:9090
