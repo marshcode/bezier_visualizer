@@ -8,5 +8,5 @@ rm $output
 for file in `find "$input" -name "*.js"`
 do
 echo "Compressing $file …"
-java -jar $yuicompressor --type js $file > $output 
+java -jar $yuicompressor --type js $file >> $output 
 done
