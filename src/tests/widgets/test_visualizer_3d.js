@@ -21,12 +21,19 @@ function create_curve_storage_3d() {
 
 function instrumented_renderer() {
 	//rendering agent that can be used to inspect values passed to it.
+		
+
 	
 	return {
 		stack: [],
 		instrument: function (curve, radius, num_points) {
+			
+			//basic mesh.  Add methods to this as required.
+			var mesh = {
+					traverse: function(){}
+			};
 			this.stack.push([curve, radius, num_points]);
-			return {"control_ponts": null, "control_polygon": null, "curve": null};//not returning anything useful here.  Might come back to bite us?
+			return {"control_points": mesh, "control_polygon": mesh, "curve": mesh};//not returning anything useful here.  Might come back to bite us?
 		}
 	};
 }
@@ -297,7 +304,7 @@ test("set_curve with i/r and num_point change", function () {
 	curve_storage.set_curve("curve_one", curve_one);
 	viz3.set_num_points(num_points_2);
 	curve_storage.set_curve("curve_one", curve_one);
-	
+
 	equal(i_r.stack.length, 2, "i_r stack has two calls on it.");
 	
 	equal(i_r.stack[0][2], num_points_1, "assert that the original num_points was used.");
