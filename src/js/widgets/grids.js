@@ -7,7 +7,14 @@ BEZIER.widgets = BEZIER.widgets || {};
 BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 	
 	var container = $("<div></div>");
-	
+
+	var append_button = $("<input id='grid_append' type='button' value='Append Row' />")
+	append_button.click( function(){
+		var count = container.handsontable('countRows');
+		container.handsontable('alter', 'insert_row', count);
+	});
+	container.append(append_button);
+
 	container.handsontable({
 		data: [],
 		minSpareRows: 0,
@@ -91,9 +98,7 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 
 			var curve = storage.get_curve(curve_name);
 			var pt = BEZIER.core.dim3(0, 0, 0);
-	
-			console.log(index);
-			console.log(curve.num_points())
+
             if (index < curve.num_points() ) {
 
                 curve.insert_point(index, pt);
