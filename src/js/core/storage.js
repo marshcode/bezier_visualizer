@@ -46,11 +46,11 @@ BEZIER.storage.curve_storage = function () {
 		get_all_curves: function () {
 
 			var curve_names = this.get_curve_names();
-			var curves = [];
+			var curves = {};
 
 			for(var i=0; i<curve_names.length; i++) {
 				var curve_name = curve_names[i];
-				curves.push(this.get_curve(curve_name))
+				curves[curve_name] = this.get_curve(curve_name);
 			}
 
 			return curves;
@@ -58,7 +58,7 @@ BEZIER.storage.curve_storage = function () {
 
 		set_curve: function (name, curve) {			
 			
-			event = this.EVENT_ADDED;
+			var event = this.EVENT_ADDED;
 			if(this.has_curve(name)){
 				event = this.EVENT_UPDATED;
 			}

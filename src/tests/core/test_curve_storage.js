@@ -157,20 +157,20 @@ test("get_all_curves", function () {
 	var curve_storage = BEZIER.storage.curve_storage();
 
 	var curves = curve_storage.get_all_curves();
-	equal(curves.length, 0);
+	equal(_.keys(curves).length, 0);
 
 	curve_storage.set_curve("curve_one", curve_one);
 
 	var curves = curve_storage.get_all_curves();
-	equal(curves.length, 1);
-	ok(curves[0] === curve_one);
+	equal(_.keys(curves).length, 1);
+	ok(curves["curve_one"] === curve_one);
 
 	curve_storage.set_curve("curve_two", curve_two);
 
 	var curves = curve_storage.get_all_curves();
-	equal(curves.length, 2);
-	ok(curves[0] === curve_one);
-	ok(curves[1] === curve_two);
+	equal(_.keys(curves).length, 2);
+	ok(curves["curve_one"] === curve_one);
+	ok(curves["curve_two"] === curve_two);
 });
 
 test("clear_all_curves", function () {
