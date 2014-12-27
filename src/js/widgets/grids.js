@@ -165,15 +165,24 @@ BEZIER.widgets.cpg_controller = function (storage){
 	var add_tab_helper = function(tab_title, grid){
 		var title_key = name_key(tab_title);
 
-		$(tab_container).children("ul").append(
-            "<li id='link"+title_key+"'><a href='#tab" + title_key + "'>" + tab_title + "</a></li>"
-        );
 
-		var content = $("<div id='tab" + title_key + "'></div>");
+		var tabTitle = $('<li></li>');
+		var tabLink = $('<a></a>')
+		tabTitle.attr('id', 'link'+title_key);
+		tabLink.attr('href', '#tab'+title_key);
+		tabLink.html(tab_title);
+		tabTitle.append(tabLink);
+
+		$(tab_container).children("ul").append(tabTitle);
+
+		var content = $("<div></div>");
+		content.attr('id', 'tab' + title_key )
 		content.append(grid);
 
 		$(tab_container).append(content);
         $(tab_container).tabs("refresh");
+
+		$(tabLink).trigger( "click" );
 		return content;
     };
 
