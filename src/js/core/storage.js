@@ -42,7 +42,20 @@ BEZIER.storage.curve_storage = function () {
 			}
 			return null;
 		},
-		
+
+		get_all_curves: function () {
+
+			var curve_names = this.get_curve_names();
+			var curves = [];
+
+			for(var i=0; i<curve_names.length; i++) {
+				var curve_name = curve_names[i];
+				curves.push(this.get_curve(curve_name))
+			}
+
+			return curves;
+		},
+
 		set_curve: function (name, curve) {			
 			
 			event = this.EVENT_ADDED;
@@ -62,6 +75,14 @@ BEZIER.storage.curve_storage = function () {
 
 			delete curves[name];
 			this.trigger(this.EVENT_CLEARED, name);
+		},
+
+		clear_all_curves: function () {
+			var curve_names = this.get_curve_names();
+			for(var i=0; i<curve_names.length; i++){
+				var curve_name = curve_names[i];
+				this.clear_curve(curve_name);
+			}
 		}
 	};
 	

@@ -87,6 +87,13 @@ test("set_two_curves", function () {
 	ok(curve_storage.has_curve("curve_two"));
 });
 
+test("get_no_curve", function () {
+	var curve_storage = BEZIER.storage.curve_storage();
+	expect(1);
+	ok(!curve_storage.get_curve("no_there"), "no curve should return null");
+
+});
+
 test("get_set_override_clear_curve", function () {
 	var curve_storage = BEZIER.storage.curve_storage();
 	var curve_one = create_curve_storage(); 
@@ -142,4 +149,44 @@ test("get_set_override_clear_curve_names", function () {
 	assert_curve_name();
 	curve_storage.clear_curve("curve_one");
 	ok(curve_storage.get_curve_names().length === 0, "assert that the list is now empty.");
+});
+
+test("get_all_curves", function () {
+	var curve_one = create_curve_storage();
+	var curve_two = create_curve_storage();
+	var curve_storage = BEZIER.storage.curve_storage();
+
+	var curves = curve_storage.get_all_curves();
+	equal(curves.length, 0);
+
+	curve_storage.set_curve("curve_one", curve_one);
+
+	var curves = curve_storage.get_all_curves();
+	equal(curves.length, 1);
+	ok(curves[0] === curve_one);
+
+	curve_storage.set_curve("curve_two", curve_two);
+
+	var curves = curve_storage.get_all_curves();
+	equal(curves.length, 2);
+	ok(curves[0] === curve_one);
+	ok(curves[1] === curve_two);
+});
+
+test("clear_all_curves", function () {
+	var curve_one = create_curve_storage();
+	var curve_two = create_curve_storage();
+	var curve_storage = BEZIER.storage.curve_storage();
+
+	curve_storage.set_curve("curve_one", curve_one);
+	curve_storage.set_curve("curve_two", curve_two);
+
+	curve_storage.on(curve_storage.EVENT_CLEARED, function(curve_name){
+		ok(curve_name == "curve_one" || curve_name == "curve_two")
+	});
+
+	expect(3);
+
+	curve_storage.clear_all_curves();
+	equal(curve_storage.get_curve_names().length, 0);
 });
