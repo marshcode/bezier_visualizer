@@ -149,3 +149,7 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 	that.update();
 	return that;
 };
+
+BEZIER.widgets.cpg_controller = function (storage){
+
+};
