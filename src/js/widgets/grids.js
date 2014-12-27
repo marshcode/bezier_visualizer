@@ -8,7 +8,7 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 	
 	var container = $("<div></div>");
 
-	var append_button = $("<input id='grid_append' type='button' value='Append Row' />")
+	var append_button = $("<input id='grid_append' type='button' value='Append Row' />");
 	append_button.click( function(){
 		var count = container.handsontable('countRows');
 		container.handsontable('alter', 'insert_row', count);
@@ -26,7 +26,6 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 	        {data: 'x', type: "numeric", allowInvalid: false},
 	        {data: 'y', type: "numeric", allowInvalid: false},
 	        {data: 'z', type: "numeric", allowInvalid: false}
-	        //{data: 'highlight', type: 'checkbox', allowInvalid: false, readOnly: false}
 	    ],
 
 		afterRemoveRow: function (index) {
@@ -157,4 +156,55 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 
 BEZIER.widgets.cpg_controller = function (storage){
 
+	var tab_container = $("<div id='tabs'><ul></ul></div>");
+
+	var name_key = function(curve_name){
+		return curve_name.replace(/ /g, '_');
+	};
+
+	var add_tab_helper = function(tab_title, grid){
+		var title_key = name_key(tab_title);
+
+		$(tab_container).children("ul").append(
+            "<li id='link"+title_key+"'><a href='#tab" + title_key + "'>" + tab_title + "</a></li>"
+        );
+
+		var content = $("<div id='tab" + title_key + "'></div>");
+		content.append(grid);
+
+		$(tab_container).append(content);
+        $(tab_container).tabs("refresh");
+		return content;
+    };
+
+	var clear_tab_helper = function(curve_name){
+		var title_key = name_key(curve_name);
+		$(tab_container).children('ul').children('li#link'+title_key).remove();
+		$(tab_container).children('div#tab'+title_key).remove();
+		$(tab_container).tabs("refresh");
+	};
+
+	tab_container.tabs();
+
+	//when a curve is added, add a grid in response
+	storage.on(storage.EVENT_ADDED, function (curve_name) {
+		var cpg = BEZIER.widgets.control_point_grid(storage, curve_name);
+		add_tab_helper(curve_name, cpg.dom_element);
+	});
+
+	//when a curve is edited, update the table in response
+	//storage.on(storage.EVENT_UPDATED, function (curve_name) {
+		//var cpg.update();
+	//});
+
+	//when a curve is deleted, blow away the curve in response
+	storage.on(storage.EVENT_CLEARED, function (curve_name) {
+		clear_tab_helper(curve_name);
+	});
+
+	var that = {
+		dom_element: tab_container
+	};
+
+	return that;
 };
