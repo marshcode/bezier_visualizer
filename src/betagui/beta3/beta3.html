@@ -78,7 +78,6 @@
 			var curve_list_url = "curves/curve.list";
 
 			init_viz();
-			storage.on(storage.EVENT_ADDED, auto_frame); //reset viewer every time a curve is loaded.
 			animate();
 			load_curves(curve_list_url, [init_dat, 
 										 function(curve_list){
@@ -114,6 +113,11 @@
 			function init_dat(item_list){
 				var gui = new dat.GUI({ autoPlace: false });
 
+				var reverse_item_list = {};
+				for(var key in item_list){
+					reverse_item_list[item_list[key]] = key
+				}
+
 				/////////////////////////
 				//LOAD CURVES
 				/////////////////////////
@@ -131,9 +135,9 @@
 
 				var load_curve_folder = gui.addFolder('Load Curves');
 				var curve_list = load_curve_folder.add(load_controller, 'curve_list', item_list ).name("Curve List");
-				curve_list.onChange( function(e){
-					console.log(e);
-					load_curve(load_controller.curve_list, 'curve');
+				curve_list.onChange(function(curve_url){
+					var curve_name = reverse_item_list[curve_url];
+					load_curve(load_controller.curve_list, curve_name);
 				});
 				var refresh_curve = load_curve_folder.add(load_controller, 'refresh_curve').name("Refresh");
 
@@ -151,7 +155,7 @@
 					curve_controller.size = options.size;
 
 					curve_controller.auto_frame = function (){
-						auto_frame();
+						auto_frame(curve_name);
 					};
 
 					curve_controller.clear_curve = function (){
@@ -185,6 +189,8 @@
 						viz3D.set_curve_visibility(curve_name, curve_visible);
 						viz3D.update();
 					});
+
+					curve_controller.auto_frame();
 
 				}, gui);
 
@@ -233,8 +239,15 @@
 			
 			 }
 		
-			 function auto_frame() {
-			 	var curve_names = storage.get_curve_names();
+			 function auto_frame(curve_name) {
+
+				if(storage.has_curve(curve_name)) {
+					var curve_names = [curve_name];
+				}
+				else{
+					var curve_names = storage.get_curve_names();
+				}
+
 				var lookx = 0, looky = 0, lookz = 0;
 				var maxx = null, maxy = null, maxz = null;
 				var minx = null, miny = null, minz = null;
