@@ -118,6 +118,18 @@
 					reverse_item_list[item_list[key]] = key
 				}
 
+				//DAT doesn't provide functionality for this
+				var removeFolder = function(folder_name){
+					var folder = gui.__folders[folder_name];
+
+					folder.close();
+					folder.domElement.parentNode.parentNode.removeChild(folder.domElement.parentNode);
+
+					gui.__folders[folder_name] = undefined;
+					gui.onResize();
+				};
+
+
 				/////////////////////////
 				//LOAD CURVES
 				/////////////////////////
@@ -127,6 +139,7 @@
 
 					//remove all callbacks that we added
 					storage.off(storage.EVENT_ADDED, null, gui);
+					storage.off(storage.EVENT_CLEARED, null, gui);
 
 					gui.destroy();
 					$(gui.domElement).remove();
@@ -142,8 +155,12 @@
 				var refresh_curve = load_curve_folder.add(load_controller, 'refresh_curve').name("Refresh");
 
 				///////////////////
-				//Edit Curves.  Each time we add a curve, add a gui folder
+				//Edit Curves.  Each time we add a curve, add a gui folder.  Each time we remove one, remove the folder
 				///////////////////
+				storage.on(storage.EVENT_CLEARED, function(curve_name){
+					removeFolder(curve_name)
+				},gui);
+
 				storage.on(storage.EVENT_ADDED, function(curve_name){
 					var curve_folder = gui.addFolder(curve_name);
 					var curve_controller = {};
