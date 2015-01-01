@@ -34,17 +34,35 @@
 			canvas{
 				border:solid thin black;
 			}
-			
+
+			#grid_container{
+				margin-right:25%;
+				min-width:300px;
+				float:right;
+				overflow:hidden;
+			}
+
+			#viz_container{
+				width:800px;
+				position:relative;
+				margin:20px 0 0 20px;
+			}
+
+			#dat_container{
+				position:absolute;
+				right:0px;
+			}
+
 		</style>
 	</head>
 
 	<body>
 		
-		<div id="grid_container" style="margin-right:25%;width:300px;;float:right;overflow:hidden;">
+		<div id="grid_container">
 		</div>
 	
-		<div id="viz_container" style="width:800px;position:relative;margin:20px 0 0 20px;">
-			<span id="dat_container" style="position:absolute;right:0px;"></span>
+		<div id="viz_container">
+			<span id="dat_container"></span>
 		</div>
 
 
@@ -149,8 +167,11 @@
 				var load_curve_folder = gui.addFolder('Load Curves');
 				var curve_list = load_curve_folder.add(load_controller, 'curve_list', item_list ).name("Curve List");
 				curve_list.onChange(function(curve_url){
-					var curve_name = reverse_item_list[curve_url];
-					load_curve(load_controller.curve_list, curve_name);
+					if(curve_url){
+						var curve_name = reverse_item_list[curve_url];
+						load_curve(load_controller.curve_list, curve_name);
+					}
+
 				});
 				var refresh_curve = load_curve_folder.add(load_controller, 'refresh_curve').name("Refresh");
 
