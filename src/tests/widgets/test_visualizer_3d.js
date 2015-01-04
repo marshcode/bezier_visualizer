@@ -532,3 +532,86 @@ test("stage_basic - make_scene new_instance", function () {
 	ok(sceneA !== sceneB, "make_scene must be return different objects.");
 	
 });
+
+module("Widgets - visualizer_3d - interaction");
+
+test("curve mapping - simple mappings", function(assert){
+
+	var curve_mapping = BEZIER.widgets.interaction.curve_mapping();
+
+	var cp0 = {};
+	var cp1 = {};
+	var knot = {};
+	var curve = {};
+
+	curve_mapping.map_control_point(cp0, 0);
+	curve_mapping.map_control_point(cp1, 1);
+	curve_mapping.map_knot(knot);
+	curve_mapping.map_curve(curve);
+
+	var mapping = curve_mapping.get(cp0);
+	assert.equal(mapping.type, curve_mapping.TYPES.CONTROL_POINT);
+	assert.equal(mapping.index, 0);
+
+	mapping = curve_mapping.get(cp1);
+	assert.equal(mapping.type, curve_mapping.TYPES.CONTROL_POINT);
+	assert.equal(mapping.index, 1);
+
+	mapping = curve_mapping.get(knot);
+	assert.equal(mapping.type, curve_mapping.TYPES.KNOT);
+
+	mapping = curve_mapping.get(curve);
+	assert.equal(mapping.type, curve_mapping.TYPES.CURVE);
+
+});
+
+test("curve mapping - no mapping", function(assert){
+	var curve_mapping = BEZIER.widgets.interaction.curve_mapping();
+	var obj1 = {};
+
+	assert.ok(!curve_mapping.get(obj1));
+});
+
+test("curve mapping - insert points out of order", function(assert){
+	var curve_mapping = BEZIER.widgets.interaction.curve_mapping();
+	var cp0 = {};
+	var cp2 = {};
+
+	curve_mapping.map_control_point(cp2, 2);
+	var mapping = curve_mapping.get(cp2);
+	assert.equal(mapping.index, 2);
+
+	curve_mapping.map_control_point(cp0, 0);
+
+	mapping = curve_mapping.get(cp2);
+	assert.equal(mapping.index, 2);
+	mapping = curve_mapping.get(cp0);
+	assert.equal(mapping.index, 0);
+
+});
+
+test("curve mapping - overwriting", function(assert){
+	var curve_mapping = BEZIER.widgets.interaction.curve_mapping();
+
+	var cp0 = {}, cp0p = {};
+	var knot = {}, knotp = {};
+	var curve = {}, curvep = {};
+
+	curve_mapping.map_control_point(cp0, 0);
+	curve_mapping.map_control_point(cp0p, 0);
+
+	curve_mapping.map_knot(knot);
+	curve_mapping.map_knot(knotp);
+
+	curve_mapping.map_curve(curve);
+	curve_mapping.map_curve(curvep);
+
+	assert.ok(!curve_mapping.get(cp0));
+	assert.ok(curve_mapping.get(cp0p));
+
+	assert.ok(!curve_mapping.get(knot));
+	assert.ok(curve_mapping.get(knotp));
+
+	assert.ok(!curve_mapping.get(curve));
+	assert.ok(curve_mapping.get(curvep));
+});

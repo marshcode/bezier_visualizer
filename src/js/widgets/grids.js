@@ -154,9 +154,15 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 	return that;
 };
 
-BEZIER.widgets.cpg_controller = function (storage){
+BEZIER.widgets.cpg_controller = function (storage, grid_factory){
 
 	var tab_container = $("<div id='tabs'><ul></ul></div>");
+
+	if(!grid_factory){
+		grid_factory = function(curve_name){
+			return BEZIER.widgets.control_point_grid(storage, curve_name);
+		}
+	}
 
 	var name_key = function(curve_name){
 		return curve_name.replace(/ /g, '_');
@@ -197,7 +203,7 @@ BEZIER.widgets.cpg_controller = function (storage){
 
 	//when a curve is added, add a grid in response
 	storage.on(storage.EVENT_ADDED, function (curve_name) {
-		var cpg = BEZIER.widgets.control_point_grid(storage, curve_name);
+		var cpg = grid_factory(curve_name);
 		add_tab_helper(curve_name, cpg.dom_element);
 	});
 

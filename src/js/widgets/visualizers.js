@@ -325,4 +325,60 @@ BEZIER.widgets.stage_basic = function (width, height) {
 	};
 
 };
+////////////////////////
+//Interaction
+////////////////////////
+BEZIER.widgets.interaction = {};
 
+BEZIER.widgets.interaction.curve_mapping = function(){
+
+	var knot;
+	var curve;
+	var points = {};
+
+	var TYPES = {
+		CONTROL_POINT:"control_point",
+		KNOT:"knot",
+		CURVE:"curve"
+	};
+
+	return {
+		TYPES:TYPES,
+		map_control_point: function(object, index){
+			points[index] = object;
+		},
+		map_knot: function(object){
+			knot = object;
+		},
+		map_curve: function(object){
+			curve = object;
+		},
+		get: function(object){
+			var type;
+			var data = {};
+
+			if(object === knot){
+				type = TYPES.KNOT
+			} else if(object === curve){
+				type = TYPES.CURVE;
+			} else {
+				for(var index in points){
+					var point = points[index];
+					if(object === point){
+						type = TYPES.CONTROL_POINT
+						data.index = index;
+					}
+				}
+			}
+
+			if(type){
+				data.type = type;
+				return data;
+			}
+		}
+
+	};
+
+
+
+};
