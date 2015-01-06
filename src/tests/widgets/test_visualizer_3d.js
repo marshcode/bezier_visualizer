@@ -615,3 +615,26 @@ test("curve mapping - overwriting", function(assert){
 	assert.ok(!curve_mapping.get(curve));
 	assert.ok(curve_mapping.get(curvep));
 });
+
+test("curve mapping - get all objects", function(assert){
+	var curve_mapping = BEZIER.widgets.interaction.curve_mapping();
+
+	var cp0 = {};
+	var cp1 = {};
+	var knot = {};
+	var curve = {};
+
+	curve_mapping.map_control_point(cp0, 0);
+	curve_mapping.map_control_point(cp1, 1);
+	curve_mapping.map_knot(knot);
+	curve_mapping.map_curve(curve);
+
+	var actual = curve_mapping.get_all_objects();
+
+	assert.ok(_.include(actual, cp0));
+	assert.ok(_.include(actual, cp1));
+	assert.ok(_.include(actual, knot));
+	assert.ok(_.include(actual, curve));
+
+
+});

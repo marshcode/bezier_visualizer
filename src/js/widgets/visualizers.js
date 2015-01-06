@@ -375,6 +375,14 @@ BEZIER.widgets.interaction.curve_mapping = function(){
 				data.type = type;
 				return data;
 			}
+		},
+
+		get_all_objects: function(){
+			var all_objects = [knot, curve];
+			for(var index in points){
+				all_objects.push(points[index]);
+			}
+			return all_objects;
 		}
 
 	};
