@@ -42,16 +42,30 @@
 				overflow:hidden;
 			}
 
+			#viz_area{
+				margin:20px 0 0 20px;
+			}
+
 			#viz_container{
 				width:800px;
 				position:relative;
-				margin:20px 0 0 20px;
 			}
 
 			#dat_container{
 				position:absolute;
 				right:0px;
 			}
+
+			.mouse_interaction_choice{
+				border:solid 4px #CCCCCC;
+				padding:0px 5px;
+				display:inline-block;
+				cursor:pointer;
+			}
+			.mouse_interaction_choice.selected{
+				border-color:#000000;
+			}
+
 
 		</style>
 	</head>
@@ -60,11 +74,17 @@
 		
 		<div id="grid_container">
 		</div>
-	
-		<div id="viz_container">
-			<span id="dat_container"></span>
-		</div>
 
+		<div id="viz_area">
+			<div id="viz_container">
+				<span id="dat_container"></span>
+			</div>
+			<div> <!--This is really really ugly -->
+				Click to change mouse interaction mode:
+				<div id="mousenone" class="mouse_interaction_choice" onclick="set_interaction_mode(viz3D.MOUSE_INTERACTION_MODE.NONE)">None</div>
+				<div id="mousecamera" class="mouse_interaction_choice selected" onclick="set_interaction_mode(viz3D.MOUSE_INTERACTION_MODE.CAMERA)">Camera</div>
+			</div>
+		</div>
 
 		<script src="/lib/three/three.js"></script>
 		<script src="/lib/three/TrackballControls.js"></script>
@@ -98,22 +118,30 @@
 			var storage = BEZIER.storage.curve_storage();
 			var curve_list_url = "curves/curve.list";
 
-			init_viz();
-			animate();
-			load_curves(curve_list_url, [init_dat, 
-										 function(curve_list){
-											var key = Object.keys(curve_list)[0];
-											load_curve(curve_list[key], key); //not sure if this will hold up.  Does dat sort the keys before adding them?
-										  },
-										  init_grid//curve must be loaded first.
-			]);
+			$( document ).ready(function() {
+				init_viz();
+				animate();
+				load_curves(curve_list_url, [init_dat,
+											 function(curve_list){
+												var key = Object.keys(curve_list)[0];
+												load_curve(curve_list[key], key); //not sure if this will hold up.  Does dat sort the keys before adding them?
+											  },
+
+											  				  init_grid//curve must be loaded first.
+				]);
+				jQuery("body").keyup(function(evt){
+					var canvas = viz3D.get_dom_element();
+					console.log(document.activeElement);
+					console.log( evt );
+				});
+			});
+
+
 
 			//GRID VISUALIZER
 			function init_grid(){
 
 				var container = $("#grid_container");
-				//var cpg = BEZIER.widgets.control_point_grid(storage, curve_name)
-
 				var cpg_controller = BEZIER.widgets.cpg_controller(storage);
 				container.append(cpg_controller.dom_element);
 
@@ -124,7 +152,7 @@
 			function init_viz(){
 				viz3D = BEZIER.widgets.visualizer_3d(storage, 800, 800);
 				var container = $('#viz_container');
-				container.append(viz3D.get_dom_element())
+				container.append(viz3D.get_dom_element());
 			}
 
 		
@@ -350,9 +378,28 @@
 			 	viz3D.set_view(target, position)
 			 
 			 }
-			
-			
-		
+
+			//////////////////INTERACTION//////////////////
+			var set_interaction_mode = function(mode){
+
+				var new_selection;
+				if(mode === viz3D.MOUSE_INTERACTION_MODE.NONE){
+					viz3D.set_mouse_interaction(mode);
+					new_selection = jQuery("#mousenone");
+				}
+				else if(mode === viz3D.MOUSE_INTERACTION_MODE.CAMERA){
+					viz3D.set_mouse_interaction(mode);
+					new_selection = jQuery("#mousecamera");
+				}
+
+				var old_selection = jQuery(".mouse_interaction_choice.selected");
+				if(old_selection && new_selection){
+					old_selection.removeClass("selected");
+					new_selection.addClass("selected");
+				}
+			};
+
+
 		</script>
 
 

@@ -108,11 +108,8 @@ BEZIER.widgets.control_point_grid = function (storage, curve_name) {
 			storage.updated(curve_name);
 
 		}
-		
-
-		
 	});
-	
+
 	var that = {
 			dom_element: container,
 			curve_name: curve_name,

@@ -35,8 +35,8 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	
 	var stage = stage_factory(width || 500, height || 500);	
 	var scene = stage.make_scene();
-	
-	
+
+
 	var render_trigger = false;
 	function render() {
 		stage.renderer.render(scene, stage.camera);
@@ -60,10 +60,30 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		}
 	}
 	
-	
+	var MOUSE_INTERACTION_MODE = {
+		NONE:0,
+		CAMERA:1
+	};
 
 	
 	var that = {
+
+		MOUSE_INTERACTION_MODE:MOUSE_INTERACTION_MODE,
+		//////MOUSE_INTERACTIONS/////////
+		set_mouse_interaction: function(mode){
+
+			var enable_camera = (mode === MOUSE_INTERACTION_MODE.CAMERA);
+
+			if(mode === MOUSE_INTERACTION_MODE.NONE){
+				enable_camera = false
+			}
+
+			//handle camera mode
+			stage.camera_controls.enabled = enable_camera;
+
+		},
+
+
 		///////Options///////////	
 		get_options: function (curve_name) {
 			
