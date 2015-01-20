@@ -35,7 +35,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	
 	var stage = stage_factory(width || 500, height || 500);	
 	var scene = stage.make_scene();
-	var interaction_controller = BEZIER.widgets.interaction.interaction_controller(stage);
+	var interaction_controller = BEZIER.widgets.interaction.interaction_controller(stage, scene);
 
 
 	var render_trigger = false;
@@ -155,7 +155,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			if (position) {
 				stage.camera.position.set(position.x, position.y,  position.z);
 			}
-			
+
 			this.update();
 		},
 		
@@ -239,10 +239,10 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 
 	stage.camera_controls.addEventListener('change', render);
 
-	//that.get_dom_element().addEventListener("mouseup", function (event) {
-	//	var mousedim = {x:event.x, y:event.y};
-	//	interaction_controller.check_interaction(mousedim);
-	//});
+	that.get_dom_element().addEventListener("mouseup", function (event) {
+		var mousedim = {x:event.x-25, y:event.y-25};
+		interaction_controller.check_interaction(mousedim);
+	});
 
 	return that;
 
@@ -434,11 +434,12 @@ BEZIER.widgets.interaction.curve_mapping = function(){
 
 };
 
-BEZIER.widgets.interaction.interaction_controller = function(stage){
+BEZIER.widgets.interaction.interaction_controller = function(stage, scene){
 
 	var curves = {};
 	var events = _.extend({}, Backbone.Events);
-
+	var mouse = new THREE.Vector2();
+	var projector = new THREE.Projector();
 
 	return  {
 		events: events,
@@ -451,27 +452,22 @@ BEZIER.widgets.interaction.interaction_controller = function(stage){
 			delete curves[curve_name];
 		},
 
-		check_interaction: function(mouse_dim){
-			var raycaster = new THREE.Raycaster();
-
-
+		check_interaction: function(mouse_pos){
 			var width = stage.renderer.domElement.width;
 			var height = stage.renderer.domElement.height;
 
+			var vector = new THREE.Vector2( ( mouse_pos.x/ width ) * 2 - 1, - ( mouse_pos.y / height ) * 2 + 1);
 			var camera = stage.camera;
-			var vector = new THREE.Vector3();
-    		vector.set( ( mouse_dim.x / width ) * 2 - 1,
-				        - ( mouse_dim.y / height ) * 2 + 1,
-				 		0.5 ); // z = 0.5 important!
-			vector.unproject( camera );
-			raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+
+       		var raycaster = new THREE.Raycaster( );
+			raycaster.setFromCamera( vector, camera );
 
 			for(curve_name in curves){
 				var mapping = curves[curve_name];
-				var intersects = raycaster.intersectObjects( mapping.get_all_objects() );
-
+				var intersects = raycaster.intersectObjects( mapping.get_all_objects(), true );
 				if(intersects.length > 0){
 					console.log(intersects);
+					console.log(mapping.get(intersects[0].object));
 					return;
 				}
 			}
