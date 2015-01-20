@@ -497,6 +497,28 @@ test("render_solid_tube - basic - curve at 1000 points", function () {
 	equal(curve_mesh.geometry.path.points.length, num_points);
 });
 
+test("render_solid_tube - basic - mapping", function (assert) {
+	var curve = BEZIER.core.bezier_curve_3([BEZIER.core.dim3(0,   0, 0),
+											BEZIER.core.dim3(0,  10, 0),
+											BEZIER.core.dim3(10, 10, 0),
+											BEZIER.core.dim3(10, 0, 0)]);
+
+	var radius = 2;
+	var num_points = 1000;
+	var meshes = BEZIER.widgets.render_solid_tube(curve, radius, num_points);
+	var interaction_mapping = meshes.interaction_mapping;
+
+	assert.equal(interaction_mapping.get(meshes.curve).type, interaction_mapping.TYPES.CURVE );
+	assert.equal(interaction_mapping.get(meshes.control_polygon).type, interaction_mapping.TYPES.KNOT );
+
+	for(var i = 0; i<meshes.control_points.children.length; i++){
+		var child = meshes.control_points.children[i];
+		var mapped_value = interaction_mapping.get(child);
+		assert.equal(mapped_value.type, interaction_mapping.TYPES.CONTROL_POINT);
+		assert.equal(mapped_value.index, i);
+	}
+});
+
 
 module("Widgets - visualizer_3d - scene strategies");
 

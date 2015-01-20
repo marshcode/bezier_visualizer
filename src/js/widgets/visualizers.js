@@ -35,6 +35,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	
 	var stage = stage_factory(width || 500, height || 500);	
 	var scene = stage.make_scene();
+	var interaction_controller = BEZIER.widgets.interaction.interaction_controller(stage);
 
 
 	var render_trigger = false;
@@ -59,17 +60,28 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			});				
 		}
 	}
-	
+
 	var MOUSE_INTERACTION_MODE = {
 		NONE:0,
 		CAMERA:1
 	};
 
-	
+	var post_init_done = false;
 	var that = {
 
-		MOUSE_INTERACTION_MODE:MOUSE_INTERACTION_MODE,
+		//////POST_INIT//////////////
+		//ugly but necesary - some things need to happen after the dom_element is placed.  That can't (shouldn't) happen in the contructor
+		post_init: function(){
+			if(post_init_done){
+				return;
+			}
+
+			post_init_done = true;
+			stage.camera_controls.handleResize();
+		},
+
 		//////MOUSE_INTERACTIONS/////////
+		MOUSE_INTERACTION_MODE:MOUSE_INTERACTION_MODE,
 		set_mouse_interaction: function(mode){
 
 			var enable_camera = (mode === MOUSE_INTERACTION_MODE.CAMERA);
@@ -117,7 +129,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		update: function () {
 			render_trigger = false;
 			stage.camera_controls.update();
-			
+
 			if (!render_trigger) {
 				render();
 			}
@@ -137,11 +149,11 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			if (!target) {
 				throw BEZIER.errors.illegal_argument_error("Target cannot be null.");
 			}
-			
+
 			//copying the positions protects them from outside modification
-			stage.camera_controls.target = new THREE.Vector3(target.x, target.y, target.z);
+			stage.camera_controls.target.set(target.x, target.y, target.z);
 			if (position) {
-				stage.camera_controls.object.position = new THREE.Vector3(position.x, position.y, position.z);
+				stage.camera.position.set(position.x, position.y,  position.z);
 			}
 			
 			this.update();
@@ -187,6 +199,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			}
 	
 			delete curves[curve_name];
+			interaction_controller.clear_curve(curve_name);
 			
 		}
 	
@@ -204,7 +217,8 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			var meshes = curve_factory(curve, options.size, that.get_num_points());
 			
 			process_removed_curve(curve_name);
-			
+			interaction_controller.watch_curve(curve_name, meshes.interaction_mapping);
+
 			curves[curve_name] = {meshes: meshes, options: options};
 			scene.add(meshes.control_points);
 			scene.add(meshes.control_polygon);
@@ -213,7 +227,6 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			that.set_points_visibility(curve_name, options.points_visible);
 			that.set_polygon_visibility(curve_name, options.polygon_visible);
 			that.set_curve_visibility(curve_name, options.curve_visible);
-			
 			that.update();
 		}
 	
@@ -223,8 +236,14 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	curve_storage.on(curve_storage.EVENT_ADDED, process_edited_curve);
 	
 	curve_storage.on(curve_storage.EVENT_CLEARED, process_removed_curve);
-	
+
 	stage.camera_controls.addEventListener('change', render);
+
+	//that.get_dom_element().addEventListener("mouseup", function (event) {
+	//	var mousedim = {x:event.x, y:event.y};
+	//	interaction_controller.check_interaction(mousedim);
+	//});
+
 	return that;
 
 };
@@ -240,7 +259,7 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 	var control_point_material =  new THREE.MeshLambertMaterial({ color: 0x0000ff, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading });
 	var control_polygon_material =  new THREE.MeshLambertMaterial({color: 0x00ff00, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading});
 	var curve_material =  new THREE.MeshLambertMaterial({ color: 0xff0000, emissive: 0x000000, ambient: 0x000000, shading: THREE.SmoothShading });
-
+	var mapping = BEZIER.widgets.interaction.curve_mapping();
 	
 	//control points
 	var control_points = new THREE.Object3D();
@@ -252,6 +271,7 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 		cp_mesh.position.x = cp.x;
 		cp_mesh.position.y = cp.y;
 		cp_mesh.position.z = cp.z;
+		mapping.map_control_point(cp_mesh, i);
 		control_points.add(cp_mesh);
 	}
 	
@@ -270,23 +290,26 @@ BEZIER.widgets.render_solid_tube = function (curve, radius, num_points) {
 										control_polygon_material);
 	
 	
-	
+
 	//curve
 	var points = [];
-	var pt;
 	var tdelta = 1 / num_points;
 	for (var t = 0; t <= 1; t += tdelta) {
-		pt = curve.calculate(t);
+		var pt = curve.calculate(t);
 		points.push(new THREE.Vector3(pt.x, pt.y, pt.z));
 	}
 	var spline = new THREE.SplineCurve3(points);
 	var spline_geometry = new THREE.TubeGeometry(spline, 64, radius, 8, false);
 	var curve_mesh = new THREE.Mesh(spline_geometry, curve_material);
-	
+
+	mapping.map_knot(control_polygon);
+	mapping.map_curve(curve_mesh);
+
 	var meshes = {};
 	meshes.control_points  = control_points;
 	meshes.control_polygon = control_polygon;
 	meshes.curve           = curve_mesh;
+	meshes.interaction_mapping = mapping;
 	return meshes;
 };
 
@@ -314,7 +337,9 @@ BEZIER.widgets.stage_basic = function (width, height) {
 	
 	camera_controls.noZoom = false;
 	camera_controls.noPan = false;
-	
+	camera_controls.noRotate = false;
+
+
 
 	//SCENE
 	function make_scene() {
@@ -358,7 +383,7 @@ BEZIER.widgets.interaction.curve_mapping = function(){
 
 	var TYPES = {
 		CONTROL_POINT:"control_point",
-		KNOT:"knot",
+		KNOT:"knot", /*This should be renamed to control_polygon*/
 		CURVE:"curve"
 	};
 
@@ -407,6 +432,52 @@ BEZIER.widgets.interaction.curve_mapping = function(){
 
 	};
 
+};
+
+BEZIER.widgets.interaction.interaction_controller = function(stage){
+
+	var curves = {};
+	var events = _.extend({}, Backbone.Events);
 
 
+	return  {
+		events: events,
+
+		watch_curve: function(curve_name, mapping){
+			curves[curve_name] = mapping;
+		},
+
+		clear_curve: function(curve_name){
+			delete curves[curve_name];
+		},
+
+		check_interaction: function(mouse_dim){
+			var raycaster = new THREE.Raycaster();
+
+
+			var width = stage.renderer.domElement.width;
+			var height = stage.renderer.domElement.height;
+
+			var camera = stage.camera;
+			var vector = new THREE.Vector3();
+    		vector.set( ( mouse_dim.x / width ) * 2 - 1,
+				        - ( mouse_dim.y / height ) * 2 + 1,
+				 		0.5 ); // z = 0.5 important!
+			vector.unproject( camera );
+			raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+
+			for(curve_name in curves){
+				var mapping = curves[curve_name];
+				var intersects = raycaster.intersectObjects( mapping.get_all_objects() );
+
+				if(intersects.length > 0){
+					console.log(intersects);
+					return;
+				}
+			}
+
+
+		}
+
+	};
 };

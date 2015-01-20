@@ -4,7 +4,7 @@
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-				
+
 		<link href="/lib/handsontable/jquery.handsontable.full.css" rel="stylesheet" media="screen">
 		<link href="/lib/jquery/jquery-ui.css" rel="stylesheet" media="screen">
 
@@ -71,7 +71,7 @@
 	</head>
 
 	<body>
-		
+
 		<div id="grid_container">
 		</div>
 
@@ -88,6 +88,7 @@
 
 		<script src="/lib/three/three.js"></script>
 		<script src="/lib/three/TrackballControls.js"></script>
+
 		<script src="/lib/three/Detector.js"></script>
 		<script src="/lib/three/stats.min.js"></script>
 
@@ -101,9 +102,6 @@
 
 		<script src="/lib/handsontable/jquery.handsontable.full.js"></script>
 
-		<!--
-		<script src="/dist/js/bezierviz-min.js"></script>
-		-->
 		<script src="/src/js/core/bezier.js"></script>
 		<script src="/src/js/core/storage.js"></script>
 		<script src="/src/js/widgets/grids.js"></script>
@@ -126,14 +124,8 @@
 												var key = Object.keys(curve_list)[0];
 												load_curve(curve_list[key], key); //not sure if this will hold up.  Does dat sort the keys before adding them?
 											  },
-
-											  				  init_grid//curve must be loaded first.
+											  init_grid//curve must be loaded first.
 				]);
-				jQuery("body").keyup(function(evt){
-					var canvas = viz3D.get_dom_element();
-					console.log(document.activeElement);
-					console.log( evt );
-				});
 			});
 
 
@@ -147,15 +139,17 @@
 
 			}
 
-			
+
 			//CANVAS VISUALIZER
 			function init_viz(){
 				viz3D = BEZIER.widgets.visualizer_3d(storage, 800, 800);
 				var container = $('#viz_container');
 				container.append(viz3D.get_dom_element());
+				//we have to tell the vizualizer that the element has been added.  Some items required that dom_element to have been placed
+				viz3D.post_init();
 			}
 
-		
+
 			//////////////////
 			//GUI and controllers
 			//////////////////
@@ -265,9 +259,9 @@
 
 				var dat_container = $("#dat_container");
 				dat_container.append(gui.domElement);
-			
-			
-			}			
+
+
+			}
 			//////////////////////
 			//Curve Ajax
 			//////////////////////
@@ -278,36 +272,36 @@
 					storage.set_curve(curve_name, curve);
 				  });
 			}
-			
-			
+
+
 			function load_curves(url, callbacks){
 				$.ajax({url: url}).done(function ( data ) {
 					var curve_list = jQuery.parseJSON(data);
-					
+
 					callbacks.forEach(function (f) {
 						f(curve_list);
 					});
 				  });
-			
+
 			}
-			
+
 			////////////////////////
 			//Visualizers
 			////////////////////////
-		
+
 			function animate() {
 				requestAnimationFrame( animate );
 				viz3D.update();
 			}
-			
+
 			function clear_curve(curve_name){
 
 				if(storage.has_curve(curve_name)){
 					storage.clear_curve(curve_name)
 				}
-			
+
 			 }
-		
+
 			 function auto_frame(curve_name) {
 
 				if(storage.has_curve(curve_name)) {
@@ -321,51 +315,51 @@
 				var maxx = null, maxy = null, maxz = null;
 				var minx = null, miny = null, minz = null;
 				var rangex, rangey, rangez;
-				
+
 				$(curve_names).each(function (idx, curve_name) {
 					var curve = storage.get_curve(curve_name);
 					var xavg = 0, yavg = 0, zavg = 0;
 					var num_points = curve.num_points();
-					
+
 					var pt;
 					for (var i = 0; i < curve.num_points(); i++) {
 						pt = curve.get_point(i);
 						xavg += pt.x;
 						yavg += pt.y;
 						zavg += pt.z;
-						
+
 						maxx = Math.max(pt.x, maxx);
 						maxy = Math.max(pt.y, maxy);
-						maxz = Math.max(pt.z, maxz);				
-					
+						maxz = Math.max(pt.z, maxz);
+
 						minx = Math.min(pt.x, minx);
 						miny = Math.min(pt.y, miny);
-						minz = Math.min(pt.z, minz);	
-					
+						minz = Math.min(pt.z, minz);
+
 					}
-					
+
 					lookx += (xavg / num_points);
 					looky += (yavg / num_points);
 					lookz += (zavg / num_points);
-					
-				});		
-				
+
+				});
+
 				lookx /= curve_names.length;
 				looky /= curve_names.length;
 				lookz /= curve_names.length;
-				
+
 				rangex = maxx - minx;
 				rangey = maxy - miny;
 				rangez = maxz - minz;
-				
-				//check for a dimension that did not move at all.  If we find one, this implies that the curve lies in the 2D plane.  
+
+				//check for a dimension that did not move at all.  If we find one, this implies that the curve lies in the 2D plane.
 				//Bounding boxes will not work properly for this.  Set to the center of the other two
 				var position = new THREE.Vector3(maxx * 2, maxy * 2, maxz * 2);
-				var target   = new THREE.Vector3(lookx, looky, lookz);	
-				//TODO: the 50 here is juat a random hardcode.  The real solution is much more complicated.	
-				
+				var target   = new THREE.Vector3(lookx, looky, lookz);
+				//TODO: the 50 here is juat a random hardcode.  The real solution is much more complicated.
+
 				//zoom distance per world distance.  Calculated experimentally.  This should be OK as long as the aspect ratio is 1
-				var magic_ratio = 13/10; 
+				var magic_ratio = 13/10;
 				var view = viz3D.get_view();
 				if (rangex === 0){
 					position = new THREE.Vector3(rangey * magic_ratio, looky, lookz);
@@ -374,9 +368,9 @@
 				}else if (rangez === 0){
 					position = new THREE.Vector3(lookx, looky, rangey * magic_ratio);
 				}
-			 
+
 			 	viz3D.set_view(target, position)
-			 
+
 			 }
 
 			//////////////////INTERACTION//////////////////

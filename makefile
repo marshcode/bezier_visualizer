@@ -11,9 +11,7 @@ JS_DIST       := $(DIST_DIR)/js
 #servers and testing
 ####################
 start-server:
-	@scripts/run_jscover.sh "$(ROOT_DIR)/lib/JSCover" "$(ROOT_DIR)" $(PORT)& 
-stop-server:
-	@fuser -k $(PORT)/tcp
+	python -m SimpleHTTPServer $(PORT) 
 test:
 	@sensible-browser "http://localhost:$(PORT)/jscoverage.html?/src/tests/test-runner.html"
 	@sensible-browser "http://localhost:$(PORT)/jscoverage.html?/src/tests/test-runner-min.html"
