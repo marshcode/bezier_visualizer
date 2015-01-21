@@ -15,6 +15,7 @@ BEZIER.widgets = BEZIER.widgets  || {};
 BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_factory) {
 	//FIXME: constructor is getting a little long.  Consider adding some setters and making some sensible defaults
 	//it is also getting tougher to understand the constructor since a lot of the arguments are simple integers
+	//FIXME MORE: this class is getting big and god-like.
 	
 	if (!curve_storage) {
 		throw BEZIER.errors.illegal_argument_error("curve_storage cannot be null");
@@ -61,16 +62,17 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		}
 	}
 
-	var MOUSE_INTERACTION_MODE = {
+	var MOUSE_MODE = {
 		NONE:0,
-		CAMERA:1
+		CAMERA:1,
+		INTERACTION:2
 	};
 
 	var post_init_done = false;
 	var that = {
 
 		//////POST_INIT//////////////
-		//ugly but necesary - some things need to happen after the dom_element is placed.  That can't (shouldn't) happen in the contructor
+		//ugly but necessary - some things need to happen after the dom_element is placed.  That can't (shouldn't) happen in the contructor
 		post_init: function(){
 			if(post_init_done){
 				return;
@@ -81,20 +83,25 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		},
 
 		//////MOUSE_INTERACTIONS/////////
-		MOUSE_INTERACTION_MODE:MOUSE_INTERACTION_MODE,
-		set_mouse_interaction: function(mode){
+		MOUSE_MODE:MOUSE_MODE,
+		set_mouse_mode: function(mode){
 
-			var enable_camera = (mode === MOUSE_INTERACTION_MODE.CAMERA);
+			var enable_camera = (mode === MOUSE_MODE.CAMERA);
+			var enable_interaction = (mode === MOUSE_MODE.INTERACTION);
 
-			if(mode === MOUSE_INTERACTION_MODE.NONE){
-				enable_camera = false
+			if(mode === MOUSE_MODE.NONE){
+				enable_camera = false;
+				enable_interaction = false;
 			}
 
 			//handle camera mode
 			stage.camera_controls.enabled = enable_camera;
-
+			interaction_controller.enabled = enable_interaction;
 		},
 
+		get_mouse_interaction_event_manager: function(){
+			return interaction_controller.events;
+		},
 
 		///////Options///////////	
 		get_options: function (curve_name) {
@@ -239,11 +246,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 
 	stage.camera_controls.addEventListener('change', render);
 
-	that.get_dom_element().addEventListener("mouseup", function (event) {
-		var mousedim = {x:event.x-25, y:event.y-25};
-		interaction_controller.check_interaction(mousedim);
-	});
-
+	that.set_mouse_mode(MOUSE_MODE.NONE);
 	return that;
 
 };
@@ -434,15 +437,23 @@ BEZIER.widgets.interaction.curve_mapping = function(){
 
 };
 
-BEZIER.widgets.interaction.interaction_controller = function(stage, scene){
+BEZIER.widgets.interaction.interaction_controller = function(stage){
 
 	var curves = {};
-	var events = _.extend({}, Backbone.Events);
-	var mouse = new THREE.Vector2();
-	var projector = new THREE.Projector();
 
-	return  {
+	var EVENT_TYPES = {
+		MOUSE_DOWN:"mouse_down",
+		MOUSE_OVER:"mouse_over",
+		MOUSE_LEFT:"mouse_left",
+		MOUSE_UP:"mouse_up"
+	};
+	var events = _.extend(EVENT_TYPES, Backbone.Events);
+
+	var dom_element = stage.renderer.domElement;
+
+	var that =   {
 		events: events,
+		enabled:true,
 
 		watch_curve: function(curve_name, mapping){
 			curves[curve_name] = mapping;
@@ -453,8 +464,8 @@ BEZIER.widgets.interaction.interaction_controller = function(stage, scene){
 		},
 
 		check_interaction: function(mouse_pos){
-			var width = stage.renderer.domElement.width;
-			var height = stage.renderer.domElement.height;
+			var width = dom_element.width;
+			var height = dom_element.height;
 
 			var vector = new THREE.Vector2( ( mouse_pos.x/ width ) * 2 - 1, - ( mouse_pos.y / height ) * 2 + 1);
 			var camera = stage.camera;
@@ -466,9 +477,11 @@ BEZIER.widgets.interaction.interaction_controller = function(stage, scene){
 				var mapping = curves[curve_name];
 				var intersects = raycaster.intersectObjects( mapping.get_all_objects(), true );
 				if(intersects.length > 0){
-					console.log(intersects);
-					console.log(mapping.get(intersects[0].object));
-					return;
+					return {
+						curve_name: curve_name,
+						mapping: mapping.get(intersects[0].object),
+						intersection:intersects[0]
+					};
 				}
 			}
 
@@ -476,4 +489,82 @@ BEZIER.widgets.interaction.interaction_controller = function(stage, scene){
 		}
 
 	};
+
+	var box;
+	var get_mouse_dim_helper = function(event){
+		if(!box){
+			box = dom_element.getBoundingClientRect();
+		}
+		return {x:event.x - box.left, y:event.y - box.top};
+	};
+
+	//event listeners
+	dom_element.addEventListener("mouseup", function (evt) {
+		if(!that.enabled){return;}
+
+		var mousedim = get_mouse_dim_helper(evt);
+		var info = that.check_interaction(mousedim);
+		if(info){
+			info.event = evt;
+			events.trigger(EVENT_TYPES.MOUSE_UP, info);
+		}
+
+	});
+	dom_element.addEventListener("mousedown", function (evt) {
+		if(!that.enabled){return;}
+
+		var mousedim = get_mouse_dim_helper(evt);
+		var info = that.check_interaction(mousedim);
+		if(info){
+			info.event = evt;
+			events.trigger(EVENT_TYPES.MOUSE_DOWN, info);
+		}
+
+	});
+
+	var last_object_over;
+	dom_element.addEventListener("mousemove", function (evt) {
+		if(!that.enabled){return;}
+
+		var mousedim = get_mouse_dim_helper(evt);
+		var info = that.check_interaction(mousedim);
+
+		var do_over  = false;
+		var do_left = false;
+		var first_time = false;
+		if(!last_object_over && info){
+			//we don't have a last object but we do have a hit.  This is a brand new hit.
+			do_over = true;
+			do_left = false;
+			first_time = true;
+		}
+		else if(last_object_over && info){
+			//we have an object and a hit - we are either continuing an old hit or we have a new one.  Figure that out now.
+			do_over = true;
+			do_left = last_object_over !== info.intersection.object;
+			first_time = do_left;
+		}
+		else if(!info){
+			do_left = true;
+		}
+
+
+		if(do_left){
+			var evt = {object:last_object_over, event:event};
+			last_object_over = null;
+			events.trigger(EVENT_TYPES.MOUSE_LEFT, evt);
+		}
+
+		if(do_over){
+			info.event = evt;
+			info.first_time = first_time;
+			last_object_over = info.intersection.object;
+			events.trigger(EVENT_TYPES.MOUSE_OVER, info);
+		}
+
+
+	});
+
+
+	return that;
 };

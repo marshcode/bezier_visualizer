@@ -56,13 +56,13 @@
 				right:0px;
 			}
 
-			.mouse_interaction_choice{
+			.mouse_mode {
 				border:solid 4px #CCCCCC;
 				padding:0px 5px;
 				display:inline-block;
 				cursor:pointer;
 			}
-			.mouse_interaction_choice.selected{
+			.mouse_mode.selected{
 				border-color:#000000;
 			}
 
@@ -81,8 +81,9 @@
 			</div>
 			<div> <!--This is really really ugly -->
 				Click to change mouse interaction mode:
-				<div id="mousenone" class="mouse_interaction_choice" onclick="set_interaction_mode(viz3D.MOUSE_INTERACTION_MODE.NONE)">None</div>
-				<div id="mousecamera" class="mouse_interaction_choice selected" onclick="set_interaction_mode(viz3D.MOUSE_INTERACTION_MODE.CAMERA)">Camera</div>
+				<div id="mousenone" class="mouse_mode" onclick="set_interaction_mode(viz3D.MOUSE_MODE.NONE)">None</div>
+				<div id="mousecamera" class="mouse_mode" onclick="set_interaction_mode(viz3D.MOUSE_MODE.CAMERA)">Camera</div>
+				<div id="mouseinteraction" class="mouse_mode" onclick="set_interaction_mode(viz3D.MOUSE_MODE.INTERACTION)">Interaction</div>
 			</div>
 		</div>
 
@@ -126,6 +127,7 @@
 											  },
 											  init_grid//curve must be loaded first.
 				]);
+				setup_mouse_interactions();
 			});
 
 
@@ -147,6 +149,7 @@
 				container.append(viz3D.get_dom_element());
 				//we have to tell the vizualizer that the element has been added.  Some items required that dom_element to have been placed
 				viz3D.post_init();
+				return viz3D;
 			}
 
 
@@ -377,21 +380,39 @@
 			var set_interaction_mode = function(mode){
 
 				var new_selection;
-				if(mode === viz3D.MOUSE_INTERACTION_MODE.NONE){
-					viz3D.set_mouse_interaction(mode);
+				if(mode === viz3D.MOUSE_MODE.NONE){
 					new_selection = jQuery("#mousenone");
 				}
-				else if(mode === viz3D.MOUSE_INTERACTION_MODE.CAMERA){
-					viz3D.set_mouse_interaction(mode);
+				else if(mode === viz3D.MOUSE_MODE.CAMERA){
 					new_selection = jQuery("#mousecamera");
 				}
+				else if(mode === viz3D.MOUSE_MODE.INTERACTION){
+					new_selection = jQuery("#mouseinteraction");
+				}
 
-				var old_selection = jQuery(".mouse_interaction_choice.selected");
+				var old_selection = jQuery(".mouse_mode.selected");
 				if(old_selection && new_selection){
+					viz3D.set_mouse_mode(mode);
 					old_selection.removeClass("selected");
 					new_selection.addClass("selected");
 				}
 			};
+
+			var setup_mouse_interactions = function(){
+				set_interaction_mode(viz3D.MOUSE_MODE.CAMERA);
+
+				var event_manager = viz3D.get_mouse_interaction_event_manager();
+				var old_hex;
+				event_manager.on(event_manager.MOUSE_OVER, function(data){
+					if(data.first_time){
+						old_hex = data.intersection.object.material.color.getHex();
+					}
+					data.intersection.object.material.color.setHex( 0xffff00 );
+				});
+				event_manager.on(event_manager.MOUSE_LEFT, function(data){
+					data.object.material.color.setHex( old_hex );
+				});
+			}
 
 
 		</script>
