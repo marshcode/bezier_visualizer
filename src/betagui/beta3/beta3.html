@@ -81,9 +81,9 @@
 			</div>
 			<div> <!--This is really really ugly -->
 				Click to change mouse interaction mode:
-				<div id="mousenone" class="mouse_mode" onclick="set_interaction_mode(viz3D.MOUSE_MODE.NONE)">None</div>
-				<div id="mousecamera" class="mouse_mode" onclick="set_interaction_mode(viz3D.MOUSE_MODE.CAMERA)">Camera</div>
-				<div id="mouseinteraction" class="mouse_mode" onclick="set_interaction_mode(viz3D.MOUSE_MODE.INTERACTION)">Interaction</div>
+				<div id="mousenone" class="mouse_mode" onclick="set_mouse_mode(MOUSE_MODE.NONE)">None</div>
+				<div id="mousecamera" class="mouse_mode" onclick="set_mouse_mode(MOUSE_MODE.CAMERA)">Camera</div>
+				<div id="mouseinteraction" class="mouse_mode" onclick="set_mouse_mode(MOUSE_MODE.INTERACTION)">Interaction</div>
 			</div>
 		</div>
 
@@ -377,29 +377,46 @@
 			 }
 
 			//////////////////INTERACTION//////////////////
-			var set_interaction_mode = function(mode){
+			var MOUSE_MODE = {
+				NONE:0,
+				CAMERA:1,
+				INTERACTION:2
+			};
+			var set_mouse_mode = function(mode){
 
+				var interaction_events = viz3D.get_mouse_interaction_event_manager();
 				var new_selection;
-				if(mode === viz3D.MOUSE_MODE.NONE){
+				if(mode === MOUSE_MODE.NONE){
+					viz3D.enable_camera(false);
+					interaction_events.enabled_events = {};
 					new_selection = jQuery("#mousenone");
 				}
-				else if(mode === viz3D.MOUSE_MODE.CAMERA){
+				else if(mode === MOUSE_MODE.CAMERA){
+					viz3D.enable_camera(true);
+					interaction_events.enabled_events = {};
+					interaction_events.enabled_events[interaction_events.MOUSE_OVER] = true;
+					interaction_events.enabled_events[interaction_events.MOUSE_LEFT] = true;
 					new_selection = jQuery("#mousecamera");
 				}
-				else if(mode === viz3D.MOUSE_MODE.INTERACTION){
+				else if(mode === MOUSE_MODE.INTERACTION){
+					viz3D.enable_camera(false);
+					interaction_events.enabled_events = {};
+					interaction_events.enabled_events[interaction_events.MOUSE_OVER] = true;
+					interaction_events.enabled_events[interaction_events.MOUSE_LEFT] = true;
+					interaction_events.enabled_events[interaction_events.MOUSE_UP] = true;
+					interaction_events.enabled_events[interaction_events.MOUSE_DOWN] = true;
 					new_selection = jQuery("#mouseinteraction");
 				}
 
 				var old_selection = jQuery(".mouse_mode.selected");
 				if(old_selection && new_selection){
-					viz3D.set_mouse_mode(mode);
 					old_selection.removeClass("selected");
 					new_selection.addClass("selected");
 				}
 			};
 
 			var setup_mouse_interactions = function(){
-				set_interaction_mode(viz3D.MOUSE_MODE.CAMERA);
+				set_mouse_mode(MOUSE_MODE.CAMERA);
 
 				var event_manager = viz3D.get_mouse_interaction_event_manager();
 				var old_hex;

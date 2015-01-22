@@ -62,12 +62,6 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		}
 	}
 
-	var MOUSE_MODE = {
-		NONE:0,
-		CAMERA:1,
-		INTERACTION:2
-	};
-
 	var post_init_done = false;
 	var that = {
 
@@ -82,21 +76,9 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			stage.camera_controls.handleResize();
 		},
 
-		//////MOUSE_INTERACTIONS/////////
-		MOUSE_MODE:MOUSE_MODE,
-		set_mouse_mode: function(mode){
-
-			var enable_camera = (mode === MOUSE_MODE.CAMERA);
-			var enable_interaction = (mode === MOUSE_MODE.INTERACTION);
-
-			if(mode === MOUSE_MODE.NONE){
-				enable_camera = false;
-				enable_interaction = false;
-			}
-
-			//handle camera mode
-			stage.camera_controls.enabled = enable_camera;
-			interaction_controller.enabled = enable_interaction;
+		///////////CAMERA
+		enable_camera: function(is_enabled){
+			stage.camera_controls.enabled = is_enabled;
 		},
 
 		get_mouse_interaction_event_manager: function(){
@@ -245,8 +227,6 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 	curve_storage.on(curve_storage.EVENT_CLEARED, process_removed_curve);
 
 	stage.camera_controls.addEventListener('change', render);
-
-	that.set_mouse_mode(MOUSE_MODE.NONE);
 	return that;
 
 };
@@ -441,19 +421,23 @@ BEZIER.widgets.interaction.interaction_controller = function(stage){
 
 	var curves = {};
 
-	var EVENT_TYPES = {
+	var events = {
 		MOUSE_DOWN:"mouse_down",
 		MOUSE_OVER:"mouse_over",
 		MOUSE_LEFT:"mouse_left",
-		MOUSE_UP:"mouse_up"
+		MOUSE_UP:"mouse_up",
+		enabled_events:{}
 	};
-	var events = _.extend(EVENT_TYPES, Backbone.Events);
+	events = _.extend(events, Backbone.Events);
+	var is_event_enabled = function(event_type){
+		return events.enabled_events[event_type] === true;
+	};
+
 
 	var dom_element = stage.renderer.domElement;
 
 	var that =   {
 		events: events,
-		enabled:true,
 
 		watch_curve: function(curve_name, mapping){
 			curves[curve_name] = mapping;
@@ -500,31 +484,34 @@ BEZIER.widgets.interaction.interaction_controller = function(stage){
 
 	//event listeners
 	dom_element.addEventListener("mouseup", function (evt) {
-		if(!that.enabled){return;}
+		if(is_event_enabled(events.MOUSE_UP)){return;}
 
 		var mousedim = get_mouse_dim_helper(evt);
 		var info = that.check_interaction(mousedim);
 		if(info){
 			info.event = evt;
-			events.trigger(EVENT_TYPES.MOUSE_UP, info);
+			events.trigger(events.MOUSE_UP, info);
 		}
 
 	});
 	dom_element.addEventListener("mousedown", function (evt) {
-		if(!that.enabled){return;}
+		if(is_event_enabled(events.MOUSE_DOWN)){return;}
 
 		var mousedim = get_mouse_dim_helper(evt);
 		var info = that.check_interaction(mousedim);
 		if(info){
 			info.event = evt;
-			events.trigger(EVENT_TYPES.MOUSE_DOWN, info);
+			events.trigger(events.MOUSE_DOWN, info);
 		}
 
 	});
 
 	var last_object_over;
 	dom_element.addEventListener("mousemove", function (evt) {
-		if(!that.enabled){return;}
+		var left_enabled = is_event_enabled(events.MOUSE_LEFT);
+		var over_enabled = is_event_enabled(events.MOUSE_OVER);
+
+		if(!left_enabled && !over_enabled){return;}
 
 		var mousedim = get_mouse_dim_helper(evt);
 		var info = that.check_interaction(mousedim);
@@ -541,25 +528,24 @@ BEZIER.widgets.interaction.interaction_controller = function(stage){
 		else if(last_object_over && info){
 			//we have an object and a hit - we are either continuing an old hit or we have a new one.  Figure that out now.
 			do_over = true;
-			do_left = last_object_over !== info.intersection.object;
+			do_left = last_object_over && last_object_over !== info.intersection.object;
 			first_time = do_left;
 		}
-		else if(!info){
+		else if(!info && last_object_over){
 			do_left = true;
 		}
 
-
-		if(do_left){
+		if(do_left && left_enabled){
 			var evt = {object:last_object_over, event:event};
 			last_object_over = null;
-			events.trigger(EVENT_TYPES.MOUSE_LEFT, evt);
+			events.trigger(events.MOUSE_LEFT, evt);
 		}
 
-		if(do_over){
+		if(do_over && over_enabled){
 			info.event = evt;
 			info.first_time = first_time;
 			last_object_over = info.intersection.object;
-			events.trigger(EVENT_TYPES.MOUSE_OVER, info);
+			events.trigger(events.MOUSE_OVER, info);
 		}
 
 
