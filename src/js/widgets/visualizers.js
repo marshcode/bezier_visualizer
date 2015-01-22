@@ -484,7 +484,7 @@ BEZIER.widgets.interaction.interaction_controller = function(stage){
 
 	//event listeners
 	dom_element.addEventListener("mouseup", function (evt) {
-		if(is_event_enabled(events.MOUSE_UP)){return;}
+		if(!is_event_enabled(events.MOUSE_UP)){return;}
 
 		var mousedim = get_mouse_dim_helper(evt);
 		var info = that.check_interaction(mousedim);
@@ -495,7 +495,7 @@ BEZIER.widgets.interaction.interaction_controller = function(stage){
 
 	});
 	dom_element.addEventListener("mousedown", function (evt) {
-		if(is_event_enabled(events.MOUSE_DOWN)){return;}
+		if(!is_event_enabled(events.MOUSE_DOWN)){return;}
 
 		var mousedim = get_mouse_dim_helper(evt);
 		var info = that.check_interaction(mousedim);

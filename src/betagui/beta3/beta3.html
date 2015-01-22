@@ -403,7 +403,6 @@
 					interaction_events.enabled_events = {};
 					interaction_events.enabled_events[interaction_events.MOUSE_OVER] = true;
 					interaction_events.enabled_events[interaction_events.MOUSE_LEFT] = true;
-					interaction_events.enabled_events[interaction_events.MOUSE_UP] = true;
 					interaction_events.enabled_events[interaction_events.MOUSE_DOWN] = true;
 					new_selection = jQuery("#mouseinteraction");
 				}
@@ -420,15 +419,45 @@
 
 				var event_manager = viz3D.get_mouse_interaction_event_manager();
 				var old_hex;
+				var drag_target;
+				var dom_element = viz3D.get_dom_element();
+
+				//color interactions
 				event_manager.on(event_manager.MOUSE_OVER, function(data){
 					if(data.first_time){
 						old_hex = data.intersection.object.material.color.getHex();
+						data.intersection.object.material.color.setHex( 0xffff00 );
 					}
-					data.intersection.object.material.color.setHex( 0xffff00 );
 				});
 				event_manager.on(event_manager.MOUSE_LEFT, function(data){
 					data.object.material.color.setHex( old_hex );
 				});
+
+
+				//control point drag interactions
+				event_manager.on(event_manager.MOUSE_DOWN, function(data){
+					if(data.mapping.type == "control_point"){
+						drag_target = data;
+					}
+				});
+
+				jQuery(dom_element).mouseup(function(){
+					drag_target = null;
+				});
+				jQuery(dom_element).mousemove(function(){
+					if(!drag_target){
+						return;
+					}
+
+					var curve = storage.get_curve(drag_target.curve_name);
+					var pt = curve.get_point(drag_target.mapping.index);
+					pt.x += 0.1; //MATH GOES HERE
+					storage.updated(drag_target.curve_name);
+
+
+				});
+
+
 			}
 
 
