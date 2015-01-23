@@ -419,8 +419,7 @@
 
 				var event_manager = viz3D.get_mouse_interaction_event_manager();
 				var old_hex;
-				var drag_target;
-				var dom_element = viz3D.get_dom_element();
+
 
 				//color interactions
 				event_manager.on(event_manager.MOUSE_OVER, function(data){
@@ -435,23 +434,52 @@
 
 
 				//control point drag interactions
+				var drag_target;
+				var dom_element = viz3D.get_dom_element();
 				event_manager.on(event_manager.MOUSE_DOWN, function(data){
 					if(data.mapping.type == "control_point"){
 						drag_target = data;
+						var original_point = storage.get_curve(data.curve_name).get_point(data.mapping.index);
+						drag_target.original_point = new BEZIER.core.dim3(
+								original_point.x,
+								original_point.y,
+								original_point.z);
 					}
 				});
 
 				jQuery(dom_element).mouseup(function(){
 					drag_target = null;
 				});
-				jQuery(dom_element).mousemove(function(){
+				jQuery(dom_element).mousemove("mousedown", function(event){
 					if(!drag_target){
 						return;
 					}
+					var camera_view = viz3D.get_view();
+					var camera_normal = new THREE.Vector3(
+							camera_view.target.x - camera_view.position.x,
+							camera_view.target.y - camera_view.position.y,
+							camera_view.target.z - camera_view.position.z
+					);
+
+					camera_normal.normalize();
+					var z_axis = new THREE.Vector3(0,0,1);
+					var quaternion = new THREE.Quaternion().setFromUnitVectors( z_axis, camera_normal);
+					var matrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
+					var point_offset_vector = new THREE.Vector3(
+						drag_target.event.clientX - event.clientX,
+						drag_target.event.clientY - event.clientY,
+						0
+					);
+
+					point_offset_vector.multiplyScalar(0.0001);
+					point_offset_vector.transformDirection(matrix);
+
 
 					var curve = storage.get_curve(drag_target.curve_name);
 					var pt = curve.get_point(drag_target.mapping.index);
-					pt.x += 0.1; //MATH GOES HERE
+					pt.x = drag_target.original_point.x + point_offset_vector.x;
+					pt.y = drag_target.original_point.y + point_offset_vector.y;
+					pt.z = drag_target.original_point.z + point_offset_vector.z;
 					storage.updated(drag_target.curve_name);
 
 

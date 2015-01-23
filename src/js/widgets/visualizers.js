@@ -76,7 +76,7 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			stage.camera_controls.handleResize();
 		},
 
-		///////////CAMERA
+		///////////CONTROLS/////////////////
 		enable_camera: function(is_enabled){
 			stage.camera_controls.enabled = is_enabled;
 		},
@@ -99,7 +99,30 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 			
 			return jQuery.extend({}, curve_info.options);
 		},
-			
+
+		get_view: function () {
+			var target = stage.camera_controls.target;
+			var position = stage.camera_controls.object.position;
+			//copying the positions protects them from outside modification
+			return {"target": BEZIER.core.dim3(target.x, target.y, target.z),
+				    "position": BEZIER.core.dim3(position.x, position.y, position.z)};
+		},
+
+		set_view: function (target, position) {
+
+			if (!target) {
+				throw BEZIER.errors.illegal_argument_error("Target cannot be null.");
+			}
+
+			//copying the positions protects them from outside modification
+			stage.camera_controls.target.set(target.x, target.y, target.z);
+			if (position) {
+				stage.camera.position.set(position.x, position.y,  position.z);
+			}
+
+			this.update();
+		},
+
 		/////////POINTS//////////
 		get_num_points: function () {
 			return num_points;
@@ -125,29 +148,6 @@ BEZIER.widgets.visualizer_3d = function (curve_storage, width, height, stage_fac
 		},
 		
 		////////RENDERING OPTIONS////////////
-		get_view: function () {
-			var target = stage.camera_controls.target;
-			var position = stage.camera_controls.object.position;
-			//copying the positions protects them from outside modification
-			return {"target": BEZIER.core.dim3(target.x, target.y, target.z),
-				    "position": BEZIER.core.dim3(position.x, position.y, position.z)};
-		},
-		
-		set_view: function (target, position) {
-			
-			if (!target) {
-				throw BEZIER.errors.illegal_argument_error("Target cannot be null.");
-			}
-
-			//copying the positions protects them from outside modification
-			stage.camera_controls.target.set(target.x, target.y, target.z);
-			if (position) {
-				stage.camera.position.set(position.x, position.y,  position.z);
-			}
-
-			this.update();
-		},
-		
 		set_curve_size: function (curve_name, radius){
 			var curve_info = curves[curve_name];
 			if (!curve_info) {
